@@ -16,7 +16,9 @@ Abre `http://localhost:8000` en el navegador. Se requiere un servidor local porq
 
 Abre el engrane para configurar una duración de enfoque distinta por sesión del ciclo, además de las pausas, sesiones por ciclo, color de acento, sonido al terminar y notificaciones. Los botones de iniciar y pausar también dan una señal sonora breve. Al activar notificaciones, el navegador solicitará permiso; permite las notificaciones para recibir avisos del sistema al terminar sesiones y pausas. El temporizador en curso se recupera al recargar la página. La barra espaciadora inicia o pausa la sesión.
 
-La alarma de fin de sesión reproduce un MP3 local de Mixkit; su crédito y licencia están en `assets/audio/ATTRIBUTION.md`.
+En Ajustes puedes elegir entre Campanas, Flauta y Melodía y escucharlas antes de guardar. La opción elegida se conserva en el navegador y se usa al terminar sesiones y pausas. Cada aviso reproduce dos veces un MP3 local de Mixkit; los tres funcionan sin conexión en la PWA. Sus créditos y licencia están en `assets/audio/ATTRIBUTION.md`.
+
+Las secciones de sesiones y sonidos empiezan contraídas cada vez que abres Ajustes. Alarma sonora y notificaciones están activadas por defecto para nuevas configuraciones y al restaurar los valores. El permiso de notificaciones se solicita al comenzar una sesión o guardar los ajustes; los avisos necesitan autorización del navegador. Las preferencias previamente guardadas se conservan.
 
 La frase motivadora cambia cada día y se elige localmente; no se necesita conexión.
 

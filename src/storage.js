@@ -1,3 +1,5 @@
+import { DEFAULT_ALARM, isValidAlarm } from './alarms.js';
+
 const STORAGE_KEY = 'brota-pomodoro-v1';
 
 export const DEFAULT_SETTINGS = {
@@ -7,7 +9,8 @@ export const DEFAULT_SETTINGS = {
   cycle: 4,
   color: 'sage',
   sound: true,
-  notifications: false,
+  alarm: DEFAULT_ALARM,
+  notifications: true,
 };
 
 const DEFAULT_STATE = {
@@ -33,6 +36,7 @@ function migrateSettings(savedSettings = {}) {
   const settings = {
     ...DEFAULT_SETTINGS,
     ...savedSettings,
+    alarm: isValidAlarm(savedSettings.alarm) ? savedSettings.alarm : DEFAULT_ALARM,
     cycle,
     focusDurations: Array.from({ length: 8 }, (_, index) =>
       boundedInteger(savedDurations[index], 1, 180, legacyFocus),

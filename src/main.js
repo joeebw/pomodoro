@@ -1,6 +1,8 @@
 import { DEFAULT_SETTINGS, loadState, saveState } from './storage.js';
 import { durationFor, formatTime, getPlantStage, MODES } from './timer.js';
 import { getDailyQuote } from './quotes.js';
+import { ALARMS, playAlarm, stopAlarm } from './alarms.js';
+import { createSettingsSections } from './settings-sections.js';
 import './pwa.js';
 
 const $ = (selector) => document.querySelector(selector);
@@ -12,8 +14,9 @@ const elements = {
   dialog: $('#settings-dialog'), form: $('#settings-form'), toast: $('#toast'), focusDurations: $('#focus-durations'),
 };
 const ringLength = 2 * Math.PI * 147;
-const completionAlarm = new Audio(new URL('../assets/audio/session-alarm.mp3', import.meta.url));
-completionAlarm.preload = 'auto';
+const settingsSections = createSettingsSections(elements.dialog, (section) => {
+  if (section.id === 'alarm-section') stopAlarmPreview();
+});
 let state = loadState();
 let mode = state.timer?.mode || 'focus';
 let focusDurationDrafts = [...state.settings.focusDurations];
@@ -24,6 +27,7 @@ let endsAt = state.timer?.endsAt || null;
 let remaining = endsAt ? Math.max(0, endsAt - Date.now()) / 1000 : activeDuration;
 let interval = null;
 let toastTimeout = null;
+let previewButton = null;
 
 function persist() {
   state.timer = interval && endsAt ? { mode, endsAt, duration: activeDuration } : null;
@@ -112,6 +116,11 @@ function startTimer() {
     pauseTimer();
     return;
   }
+  requestNotificationPermission(state.settings.notifications)?.then((permission) => {
+    if (permission !== 'granted') {
+      showToast('Permite las notificaciones desde los ajustes del navegador para recibir avisos.');
+    }
+  });
   endsAt = Date.now() + remaining * 1000;
   interval = window.setInterval(syncTimerFromClock, 1000);
   updateTimer();
@@ -199,11 +208,41 @@ function showToast(message) {
 }
 
 function playChime() {
-  completionAlarm.currentTime = 0;
-  completionAlarm.volume = 1;
-  completionAlarm.play().catch(() => {
-    showToast('El navegador bloqueó el sonido. Toca la pantalla para habilitarlo.');
+  playAlarm(state.settings.alarm, {
+    onError: () => showToast('No se pudo reproducir la alarma. Revisa el audio del navegador.'),
   });
+}
+
+function stopAlarmPreview() {
+  if (previewButton) stopAlarm();
+}
+
+function previewAlarm(button) {
+  if (previewButton === button) {
+    stopAlarmPreview();
+    return;
+  }
+  stopAlarmPreview();
+  previewButton = button;
+  button.textContent = 'Detener';
+  button.setAttribute('aria-label', `Detener ${button.dataset.alarmName}`);
+  playAlarm(button.dataset.previewAlarm, {
+    onEnd: () => {
+      button.textContent = 'Escuchar';
+      button.setAttribute('aria-label', `Escuchar ${button.dataset.alarmName}`);
+      previewButton = null;
+    },
+    onError: () => showToast('No se pudo reproducir el audio. Intenta escucharlo de nuevo.'),
+  });
+}
+
+function requestNotificationPermission(requested) {
+  if (!requested || typeof Notification === 'undefined' || Notification.permission !== 'default') return null;
+  try {
+    return Notification.requestPermission().catch(() => 'denied');
+  } catch {
+    return Promise.resolve('denied');
+  }
 }
 
 async function sendNotification(title, body) {
@@ -265,17 +304,21 @@ function renderFocusDurationInputs(cycle, durations) {
 }
 
 function fillSettingsForm(settings = state.settings) {
+  stopAlarmPreview();
   $('#short-length').value = settings.short;
   $('#long-length').value = settings.long;
   $('#cycle-length').value = settings.cycle;
   renderFocusDurationInputs(settings.cycle, settings.focusDurations);
   $('#sound-toggle').checked = settings.sound;
+  const selectedAlarm = $(`#alarm-options input[value="${settings.alarm}"]`);
+  if (selectedAlarm) selectedAlarm.checked = true;
   $('#notification-toggle').checked = settings.notifications;
   applyColor(settings.color);
 }
 
 function openSettings() {
   fillSettingsForm();
+  settingsSections.reset();
   elements.dialog.showModal();
 }
 
@@ -287,14 +330,7 @@ function discardSettings() {
 function saveSettings(event) {
   event.preventDefault();
   const notificationsRequested = $('#notification-toggle').checked;
-  let permissionRequest = null;
-  if (notificationsRequested && typeof Notification !== 'undefined' && Notification.permission === 'default') {
-    try {
-      permissionRequest = Notification.requestPermission();
-    } catch {
-      permissionRequest = Promise.resolve('denied');
-    }
-  }
+  const permissionRequest = requestNotificationPermission(notificationsRequested);
   const numberValue = (id, min, max, fallback) => boundedInput($(id).value, min, max, fallback);
   const selectedColor = $('.color-swatch.selected')?.dataset.color || 'sage';
   const cycle = numberValue('#cycle-length', 2, 8, DEFAULT_SETTINGS.cycle);
@@ -306,7 +342,8 @@ function saveSettings(event) {
     long: numberValue('#long-length', 1, 90, DEFAULT_SETTINGS.long),
     cycle,
     sound: $('#sound-toggle').checked,
-    notifications: notificationsRequested && typeof Notification !== 'undefined' && Notification.permission === 'granted',
+    alarm: $('#alarm-options input:checked')?.value || DEFAULT_SETTINGS.alarm,
+    notifications: notificationsRequested,
     color: selectedColor,
   };
   if (!interval) {
@@ -324,8 +361,6 @@ function saveSettings(event) {
     showToast('Permite las notificaciones de este sitio desde los ajustes del navegador.');
   } else if (permissionRequest) {
     permissionRequest.then((permission) => {
-      state.settings.notifications = permission === 'granted';
-      persist();
       showToast(permission === 'granted'
         ? 'Notificaciones activadas.'
         : 'Permite las notificaciones de este sitio desde los ajustes del navegador.');
@@ -372,6 +407,21 @@ elements.dialog.addEventListener('click', (event) => {
   if (event.target === elements.dialog) discardSettings();
 });
 elements.dialog.addEventListener('cancel', () => applyColor(state.settings.color));
+elements.dialog.addEventListener('close', stopAlarmPreview);
+$('#alarm-options').innerHTML = ALARMS.map((alarm) => `
+  <div class="alarm-option">
+    <label class="alarm-label">
+      <input type="radio" name="alarm" value="${alarm.id}" />
+      <span><strong>${alarm.name}</strong><small>${alarm.description}</small></span>
+    </label>
+    <button type="button" class="alarm-preview" data-preview-alarm="${alarm.id}" data-alarm-name="${alarm.name}" aria-label="Escuchar ${alarm.name}">Escuchar</button>
+  </div>
+`).join('');
+$('#alarm-options').addEventListener('click', (event) => {
+  const button = event.target.closest('[data-preview-alarm]');
+  if (button) previewAlarm(button);
+});
+$('#alarm-options').addEventListener('change', stopAlarmPreview);
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') syncTimerFromClock();
 });
