@@ -9,6 +9,19 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="brota" />
     <title>brota — tiempo para ti</title>
+    <script>
+      // Apply the saved theme before painting the page.
+      try {
+        const saved = JSON.parse(localStorage.getItem('brota-pomodoro-v1'));
+        const theme = saved?.settings?.theme;
+        const dark = theme === 'dark' || (theme === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        const experience = saved?.experience;
+        const writer = experience?.writerUnlocked === true && experience?.active === 'writer';
+        document.documentElement.dataset.experience = writer ? 'writer' : 'brota';
+        document.querySelector('meta[name="theme-color"]').content = writer ? (dark ? '#211d19' : '#f5f0e6') : (dark ? '#151e19' : '#f5f3ed');
+      } catch { /* Use the default light theme if storage is unavailable. */ }
+    </script>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
     <link rel="manifest" href="manifest.webmanifest" />
@@ -16,13 +29,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="writer.css" />
   </head>
   <body>
     <div class="app-shell">
       <header class="topbar">
-        <a class="brand" href="#" aria-label="Brota, inicio"><span class="brand-mark" aria-hidden="true">✳</span> brota</a>
+        <a class="brand" href="#" aria-label="Brota, inicio"><span class="brand-mark" aria-hidden="true">✳</span><span id="brand-name">brota</span></a>
         <div class="topbar-right">
-          <div class="streak"><span aria-hidden="true">✿</span><span id="plant-count">0</span><span class="streak-label">plantas</span></div>
+          <div class="streak"><span id="progress-icon" aria-hidden="true">✿</span><span id="plant-count">0</span><span class="streak-label" id="progress-label">plantas</span></div>
           <button class="icon-button install-button" id="install-app" type="button" aria-label="Instalar Brota" title="Instalar Brota" hidden>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4"/><path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></svg>
           </button>
@@ -38,10 +52,17 @@
       <main class="main-layout">
         <section class="focus-panel" aria-label="Temporizador Pomodoro">
           <div class="eyebrow"><span class="live-dot"></span><span id="session-label">TU MOMENTO DE ENFOQUE</span></div>
-          <figure class="daily-quote" aria-label="Frase del día">
+          <div id="daily-quote-home"><figure class="daily-quote" aria-label="Frase del día">
             <blockquote id="daily-quote-text"></blockquote>
             <figcaption id="daily-quote-author"></figcaption>
-          </figure>
+            <p class="reading-work" id="daily-quote-work" hidden></p>
+            <a class="reading-source" id="daily-quote-source" target="_blank" rel="noopener noreferrer" hidden>Leer la obra <span aria-hidden="true">↗</span></a>
+          </figure></div>
+          <div class="writer-intro">
+            <p class="section-kicker">UN ESPACIO PARA TU VOZ</p>
+            <h1>Todo empieza<br />con una <em>línea.</em></h1>
+            <p>El mundo puede esperar. Tu historia, aquí.</p>
+          </div>
           <div class="mode-switch" role="tablist" aria-label="Tipo de sesión">
             <button class="mode active" data-mode="focus" role="tab" aria-selected="true">Enfoque</button>
             <button class="mode" data-mode="short" role="tab" aria-selected="false">Pausa corta</button>
@@ -49,6 +70,36 @@
           </div>
 
           <div class="timer-wrap">
+            <svg class="writer-machine" viewBox="0 0 640 480" aria-hidden="true">
+              <defs>
+                <linearGradient id="machine-body" x2="0" y2="1"><stop stop-color="#53605a"/><stop offset="1" stop-color="#26332e"/></linearGradient>
+                <linearGradient id="machine-front" x2="0" y2="1"><stop stop-color="#3d4b43"/><stop offset="1" stop-color="#18251f"/></linearGradient>
+                <linearGradient id="machine-paper" x2="0" y2="1"><stop stop-color="#fffcf1"/><stop offset="1" stop-color="#e8dfc8"/></linearGradient>
+                <radialGradient id="machine-shadow"><stop stop-color="#30271b" stop-opacity=".24"/><stop offset="1" stop-color="#30271b" stop-opacity="0"/></radialGradient>
+              </defs>
+              <ellipse cx="320" cy="440" rx="295" ry="28" fill="url(#machine-shadow)"/>
+              <g class="machine-paper"><path d="M163 32Q320 14 477 32L485 260H155Z" fill="url(#machine-paper)" stroke="#d4c8ae"/>
+                <path d="M188 56H452M188 209H452" stroke="#b6a88b" stroke-opacity=".5"/>
+                <text x="320" y="77" text-anchor="middle" fill="#98876c" font-family="monospace" font-size="10" letter-spacing="4">UN MOMENTO PARA CREAR</text>
+                <g fill="#958975" opacity=".35"><rect x="193" y="220" width="155" height="3" rx="1"/><rect x="193" y="231" width="220" height="3" rx="1"/></g>
+              </g>
+              <rect x="105" y="238" width="430" height="26" rx="13" fill="#19241f"/>
+              <rect x="101" y="244" width="438" height="5" rx="2" fill="#869083"/>
+              <g fill="#313c35" stroke="#919787" stroke-width="2"><circle cx="85" cy="251" r="20"/><circle cx="555" cy="251" r="20"/></g>
+              <path d="M79 227V209H47V201H112" fill="none" stroke="#a49a7d" stroke-width="7" stroke-linecap="round"/>
+              <path d="M130 266Q130 250 147 250H493Q510 250 510 266L561 396Q566 427 537 430H103Q74 427 79 396Z" fill="url(#machine-body)" stroke="#1c2922" stroke-width="2"/>
+              <path d="M158 265H482L501 311H139Z" fill="#202e26" stroke="#738173"/>
+              <path d="M161 267L179 305M186 267L200 305M211 267L221 305M236 267L242 305M261 267L263 305M286 267L284 305M311 267L305 305M336 267L326 305M361 267L347 305M386 267L368 305M411 267L389 305M436 267L410 305M461 267L431 305" stroke="#9d9d88" stroke-width="2" opacity=".55"/>
+              <path class="machine-typebar" d="M320 304v-39h6" fill="none" stroke="#cbb98c" stroke-width="4" stroke-linecap="round"/>
+              <circle class="machine-status-light" cx="482" cy="286" r="4" />
+              <path d="M110 321H530L551 393H89Z" fill="#15221c" stroke="#68796b"/>
+              <g id="machine-keys" fill="#e6dfc8" stroke="#a19982" stroke-width="2"></g>
+              <path d="M86 397H554L549 418Q547 430 532 430H108Q93 430 91 419Z" fill="url(#machine-front)"/>
+              <rect x="222" y="389" width="196" height="13" rx="6" fill="#dbd2bb" stroke="#aaa087"/>
+              <rect x="274" y="410" width="92" height="13" rx="3" fill="#ab9870"/>
+              <text x="320" y="420" text-anchor="middle" fill="#26352c" font-family="serif" font-size="9" letter-spacing="4">BROTA</text>
+              <g fill="#17231d"><rect x="113" y="429" width="37" height="9" rx="4"/><rect x="490" y="429" width="37" height="9" rx="4"/></g>
+            </svg>
             <svg class="timer-ring" viewBox="0 0 320 320" aria-hidden="true">
               <circle class="ring-track" cx="160" cy="160" r="147" />
               <circle class="ring-progress" id="ring-progress" cx="160" cy="160" r="147" />
@@ -67,7 +118,13 @@
         </section>
 
         <aside class="garden-panel" aria-label="Tu jardín">
-          <div class="garden-heading"><div><p class="section-kicker">TU JARDÍN</p><h2>Algo bonito<br />está creciendo.</h2></div><span class="garden-sun" aria-hidden="true">☼</span></div>
+          <section class="writer-reading" aria-label="Escrito del día">
+            <div class="reading-heading"><span>ESCRITO DEL DÍA</span><time id="reading-date"></time></div>
+            <span class="reading-ornament" aria-hidden="true">“</span>
+            <div id="writer-reading-home"></div>
+            <div class="reading-end" aria-hidden="true">✦</div>
+          </section>
+          <div class="garden-heading"><div><p class="section-kicker" id="garden-kicker">TU JARDÍN</p><h2 id="garden-title">Algo bonito<br />está creciendo.</h2></div><span class="garden-sun" aria-hidden="true">☼</span></div>
           <div class="garden-scene" id="garden-scene">
             <div class="scene-sky"><span class="cloud cloud-one"></span><span class="cloud cloud-two"></span><span class="tiny-bird">⌁</span></div>
             <div class="plant-stage" id="plant-stage" aria-label="Una semilla lista para crecer">
@@ -85,11 +142,39 @@
               </svg>
               <div class="sparkle sparkle-a">✦</div><div class="sparkle sparkle-b">✧</div>
             </div>
+            <div class="manuscript-stage" id="manuscript-stage" data-stage="0" role="img" aria-label="Una hoja en blanco" hidden>
+              <svg class="manuscript-art" viewBox="0 0 260 245" aria-hidden="true">
+                <ellipse class="manuscript-shadow" cx="126" cy="220" rx="89" ry="9" />
+                <g class="manuscript-stack">
+                  <rect class="manuscript-sheet sheet-back" x="59" y="25" width="148" height="182" rx="3" transform="rotate(7 133 116)" />
+                  <rect class="manuscript-sheet sheet-middle" x="49" y="25" width="148" height="182" rx="3" transform="rotate(-5 123 116)" />
+                </g>
+                <rect class="manuscript-sheet" x="51" y="18" width="148" height="187" rx="3" />
+                <path class="manuscript-margin" d="M75 36v150" />
+                <text class="manuscript-heading" x="86" y="49">BORRADOR</text>
+                <g class="manuscript-lines first-lines">
+                  <path d="M86 68h89M86 79h70M86 90h84" />
+                </g>
+                <g class="manuscript-lines more-lines">
+                  <path d="M86 108h82M86 119h88M86 130h60M86 148h87M86 159h73M86 170h81" />
+                </g>
+                <g class="manuscript-pencil" transform="rotate(19 216 132)">
+                  <rect x="212" y="64" width="8" height="115" rx="2" />
+                  <path class="pencil-tip" d="m212 179 4 12 4-12" />
+                  <path class="pencil-mark" d="m215 188 1 3 1-3" />
+                </g>
+                <g class="manuscript-complete">
+                  <path d="M168 181h18" />
+                  <text x="168" y="193">FIN</text>
+                </g>
+                <text class="manuscript-page-number" x="121" y="194">01</text>
+              </svg>
+            </div>
             <div class="ground"></div>
             <div class="garden-caption"><span class="caption-dot"></span><span id="plant-caption">Una semilla llena de posibilidades</span></div>
           </div>
           <div class="garden-footer"><div class="cycle-info"><span class="cycle-icon">↗</span><span id="cycle-label">Tu primer ciclo empieza aquí</span></div><div class="cycle-dots" id="cycle-dots" aria-label="Progreso del ciclo"><span></span><span></span><span></span><span></span></div></div>
-          <div class="garden-tip"><span class="tip-icon">✿</span><p><strong>Un pequeño recordatorio</strong><br />Cada minuto de enfoque ayuda a tu planta a crecer. Cuídala a tu ritmo.</p></div>
+          <div class="garden-tip"><span class="tip-icon">✿</span><p><strong>Un pequeño recordatorio</strong><br /><span id="garden-tip-text">Cada minuto de enfoque ayuda a tu planta a crecer. Cuídala a tu ritmo.</span></p></div>
         </aside>
       </main>
 
@@ -115,16 +200,42 @@
         <div class="appearance-setting"><div><strong>Color de acento</strong><small>Elige tu tono favorito</small></div><div class="color-options" role="radiogroup" aria-label="Color de acento">
           <button type="button" class="color-swatch selected" data-color="sage" aria-label="Verde salvia" aria-checked="true" role="radio"></button><button type="button" class="color-swatch" data-color="rose" aria-label="Rosa suave" aria-checked="false" role="radio"></button><button type="button" class="color-swatch" data-color="lavender" aria-label="Lavanda" aria-checked="false" role="radio"></button><button type="button" class="color-swatch" data-color="ocean" aria-label="Azul océano" aria-checked="false" role="radio"></button>
         </div></div>
+        <label class="setting-row" for="theme-select">
+          <span><strong>Apariencia</strong><small>Elige la luz de tu espacio</small></span>
+          <select class="theme-select" id="theme-select">
+            <option value="light">Claro</option>
+            <option value="dark">Oscuro</option>
+            <option value="system">Sistema</option>
+          </select>
+        </label>
+        <label class="setting-row" id="experience-setting" for="experience-select" hidden>
+          <span><strong>Tu espacio</strong><small>Se guarda al elegirlo</small></span>
+          <select class="theme-select" id="experience-select">
+            <option value="brota">Brota</option>
+            <option value="writer">Escritor</option>
+          </select>
+        </label>
         <label class="toggle-row"><span><strong>Alarma sonora</strong><small>Tu sonido al terminar sesiones y pausas</small></span><input type="checkbox" id="sound-toggle" /><span class="toggle-track"></span></label>
         <label class="toggle-row"><span><strong>Notificaciones</strong><small>Aviso del sistema al terminar</small></span><input type="checkbox" id="notification-toggle" /><span class="toggle-track"></span></label>
         <details class="settings-section" id="alarm-section">
           <summary><span><strong>Sonido de la alarma</strong><small>Elige entre tres sonidos</small></span></summary>
           <div class="settings-section-content">
-          <fieldset class="alarm-setting">
-          <legend class="visually-hidden">Selecciona un sonido</legend>
-          <p>Escucha las opciones y elige tu favorita.</p>
-          <div id="alarm-options"></div>
-          </fieldset>
+            <fieldset class="alarm-setting">
+              <legend class="visually-hidden">Selecciona un sonido</legend>
+              <p>Escucha las opciones y elige tu favorita.</p>
+              <div id="alarm-options"></div>
+            </fieldset>
+          </div>
+        </details>
+        <details class="settings-section" id="gift-section">
+          <summary><span><strong>Tengo un código</strong><small>Tal vez haya un espacio esperando por ti</small></span></summary>
+          <div class="settings-section-content">
+            <label class="visually-hidden" for="gift-code">Código de regalo</label>
+            <div class="gift-code-row">
+              <input id="gift-code" type="text" maxlength="48" placeholder="Tu código" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-describedby="gift-feedback" />
+              <button class="save-button" id="gift-unlock" type="button">Desbloquear</button>
+            </div>
+            <p class="gift-feedback" id="gift-feedback" role="status" aria-live="polite"></p>
           </div>
         </details>
         <div class="settings-actions"><button type="button" class="text-button" id="reset-settings">Restaurar valores</button><button value="save" class="save-button">Guardar cambios</button></div>
@@ -136,6 +247,38 @@
         <p class="install-instructions" id="install-instructions"></p>
         <button class="save-button install-dismiss" id="install-dismiss" type="button">Entendido</button>
       </div>
+    </dialog>
+    <dialog class="writer-reveal" id="writer-reveal" aria-labelledby="writer-reveal-title" aria-describedby="writer-reveal-description">
+      <div class="reveal-halo" aria-hidden="true"></div>
+      <h2 class="visually-hidden" id="writer-reveal-title">Bienvenido a tu escritorio literario</h2>
+      <p class="visually-hidden" id="writer-reveal-description">Tres hojas para comenzar. Puedes saltar la presentación o pulsar Escape.</p>
+      <div class="reveal-deck" aria-live="polite" aria-atomic="true">
+        <article class="reveal-paper">
+          <span class="reveal-edition">BROTA · EDICIÓN ESCRITOR</span>
+          <span class="reveal-nib" aria-hidden="true">✒</span>
+          <h3></h3>
+          <p></p>
+          <div class="reveal-rule" aria-hidden="true"></div>
+          <a class="reveal-signature" target="_blank" rel="noopener noreferrer"></a>
+        </article>
+        <article class="reveal-paper" hidden>
+          <span class="reveal-edition">BROTA · EDICIÓN ESCRITOR</span>
+          <span class="reveal-nib" aria-hidden="true">❧</span>
+          <h3></h3>
+          <p></p>
+          <div class="reveal-rule" aria-hidden="true"></div>
+          <a class="reveal-signature" target="_blank" rel="noopener noreferrer"></a>
+        </article>
+        <article class="reveal-paper" hidden>
+          <span class="reveal-edition">BROTA · EDICIÓN ESCRITOR</span>
+          <span class="reveal-nib" aria-hidden="true">✒</span>
+          <h3></h3>
+          <p></p>
+          <div class="reveal-rule" aria-hidden="true"></div>
+          <a class="reveal-signature" target="_blank" rel="noopener noreferrer"></a>
+        </article>
+      </div>
+      <button id="writer-reveal-skip" class="reveal-skip" type="button" autofocus>Entrar al escritorio <span aria-hidden="true">↗</span></button>
     </dialog>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script type="module" src="src/main.js"></script>

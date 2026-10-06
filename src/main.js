@@ -1,16 +1,19 @@
 import { DEFAULT_SETTINGS, loadState, saveState } from './storage.js';
-import { durationFor, formatTime, getPlantStage, MODES } from './timer.js';
-import { getDailyQuote } from './quotes.js';
+import { durationFor, formatTime, MODES } from './timer.js';
+import { getExperienceCopy, renderExperience, renderExperienceProgress, unlockWriterExperience } from './experiences.js';
 import { ALARMS, playAlarm, stopAlarm } from './alarms.js';
 import { createSettingsSections } from './settings-sections.js';
+import { applyTheme } from './theme.js';
+import { revealWriterDesk, isWriterRevealOpen } from './writer-transition.js';
+import { animateWriterMachine, setWriterMachineRunning } from './writer-machine.js';
 import './pwa.js';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
 const elements = {
   timer: $('#timer'), ring: $('#ring-progress'), label: $('#session-label'), caption: $('#timer-caption'),
-  start: $('#start-button'), reset: $('#reset-button'), note: $('#session-note-text'), plant: $('#plant-stage'),
-  plantCaption: $('#plant-caption'), plantCount: $('#plant-count'), cycleLabel: $('#cycle-label'),
+  start: $('#start-button'), reset: $('#reset-button'), note: $('#session-note-text'),
+  plantCount: $('#plant-count'), cycleLabel: $('#cycle-label'),
   dialog: $('#settings-dialog'), form: $('#settings-form'), toast: $('#toast'), focusDurations: $('#focus-durations'),
 };
 const ringLength = 2 * Math.PI * 147;
@@ -18,6 +21,7 @@ const settingsSections = createSettingsSections(elements.dialog, (section) => {
   if (section.id === 'alarm-section') stopAlarmPreview();
 });
 let state = loadState();
+const experienceCopy = () => getExperienceCopy(state.experience.active);
 let mode = state.timer?.mode || 'focus';
 let focusDurationDrafts = [...state.settings.focusDurations];
 const sessionIndex = () => state.sessionsToday % state.settings.cycle;
@@ -35,11 +39,12 @@ function persist() {
 }
 
 function updateTimer() {
+  setWriterMachineRunning(Boolean(interval));
   elements.timer.textContent = formatTime(remaining);
   elements.ring.style.strokeDasharray = ringLength;
   elements.ring.style.strokeDashoffset = ringLength * (1 - Math.max(0, remaining / activeDuration));
-  elements.label.textContent = MODES[mode].label;
-  elements.caption.textContent = MODES[mode].caption;
+  elements.label.textContent = experienceCopy().modes[mode].label;
+  elements.caption.textContent = experienceCopy().modes[mode].caption;
   elements.start.innerHTML = interval
     ? '<span class="pause-icon" aria-hidden="true">Ⅱ</span><span>Pausar sesión</span>'
     : '<span class="play-icon" aria-hidden="true">▶</span><span>Comenzar sesión</span>';
@@ -48,14 +53,11 @@ function updateTimer() {
     button.classList.toggle('active', active);
     button.setAttribute('aria-selected', String(active));
   });
-  document.title = `${formatTime(remaining)} · brota`;
+  document.title = `${formatTime(remaining)} · ${state.experience.active === 'writer' ? 'brota / escritor' : 'brota'}`;
 }
 
 function updateGarden() {
-  const stage = getPlantStage(state.completed);
-  elements.plant.className = `plant-stage stage-${stage}`;
-  elements.plant.setAttribute('aria-label', ['Una semilla lista para crecer', 'Un brote tierno', 'Una planta joven', 'Una planta floreciendo', 'Una planta en su máximo esplendor'][stage]);
-  elements.plantCaption.textContent = ['Una semilla llena de posibilidades', '¡Un brote nuevo encontró su camino!', 'Tu constancia le da nuevas hojas', 'Mira qué bien está creciendo', 'Una planta feliz, gracias a ti'][stage];
+  renderExperienceProgress(state.experience.active, state.completed);
   elements.plantCount.textContent = state.completed;
   elements.cycleLabel.textContent = state.sessionsToday === 0
     ? 'Tu primer ciclo empieza aquí'
@@ -74,7 +76,7 @@ function setMode(nextMode) {
   mode = nextMode;
   activeDuration = modeDuration();
   remaining = activeDuration;
-  elements.note.textContent = mode === 'focus' ? 'Un paso a la vez. Tu planta te acompaña.' : 'Toma aire. Te lo has ganado.';
+  elements.note.textContent = mode === 'focus' ? experienceCopy().focusNote : experienceCopy().pauseNote;
   updateTimer();
   persist();
 }
@@ -90,15 +92,15 @@ function finishSession() {
     state.completed += 1;
     state.sessionsToday += 1;
     mode = state.sessionsToday % state.settings.cycle === 0 ? 'long' : 'short';
-    elements.note.textContent = '¡Sesión completa! Tu planta creció contigo.';
+    elements.note.textContent = experienceCopy().completedNote;
     notificationTitle = '¡Sesión completa!';
-    notificationBody = `Tu planta creció. Hora de una ${mode === 'long' ? 'pausa larga' : 'pausa corta'}.`;
+    notificationBody = `${experienceCopy().completedBody} Hora de una ${mode === 'long' ? 'pausa larga' : 'pausa corta'}.`;
     showToast(`${notificationTitle} ${notificationBody}`);
   } else {
     mode = 'focus';
-    elements.note.textContent = 'Pausa terminada. Cuando quieras, seguimos.';
+    elements.note.textContent = experienceCopy().breakNote;
     notificationTitle = 'Pausa terminada';
-    notificationBody = 'Toma aire; una nueva sesión de enfoque te espera.';
+    notificationBody = experienceCopy().breakBody;
     showToast(`${notificationTitle}. ${notificationBody}`);
   }
   if (state.settings.sound) playChime();
@@ -123,6 +125,7 @@ function startTimer() {
   });
   endsAt = Date.now() + remaining * 1000;
   interval = window.setInterval(syncTimerFromClock, 1000);
+  animateWriterMachine('start');
   updateTimer();
   persist();
 }
@@ -177,6 +180,7 @@ function playButtonSound(action) {
 }
 
 function pauseTimer() {
+  const wasRunning = Boolean(interval);
   if (interval && endsAt) {
     remaining = Math.max(0, (endsAt - Date.now()) / 1000);
     if (remaining <= 0) {
@@ -187,6 +191,7 @@ function pauseTimer() {
   }
   interval = null;
   endsAt = null;
+  if (wasRunning) animateWriterMachine('pause');
   updateTimer();
   persist();
 }
@@ -196,7 +201,7 @@ function resetTimer() {
   activeDuration = modeDuration();
   remaining = activeDuration;
   updateTimer();
-  elements.note.textContent = 'Temporizador listo cuando tú lo estés.';
+  elements.note.textContent = experienceCopy().readyNote;
   persist();
 }
 
@@ -313,13 +318,56 @@ function fillSettingsForm(settings = state.settings) {
   const selectedAlarm = $(`#alarm-options input[value="${settings.alarm}"]`);
   if (selectedAlarm) selectedAlarm.checked = true;
   $('#notification-toggle').checked = settings.notifications;
+  $('#theme-select').value = settings.theme;
+  applyTheme(settings.theme);
   applyColor(settings.color);
 }
 
 function openSettings() {
   fillSettingsForm();
   settingsSections.reset();
+  updateExperienceControls();
+  $('#gift-code').value = '';
+  $('#gift-code').removeAttribute('aria-invalid');
+  $('#gift-feedback').textContent = '';
   elements.dialog.showModal();
+}
+
+function updateExperienceControls() {
+  $('#experience-setting').hidden = !state.experience.writerUnlocked;
+  $('#experience-select').value = state.experience.active;
+  $('#gift-section').hidden = state.experience.writerUnlocked;
+}
+
+function activateExperience(active) {
+  if (!['brota', 'writer'].includes(active) || (active === 'writer' && !state.experience.writerUnlocked)) return;
+  const enteringWriter = active === 'writer' && state.experience.active !== 'writer';
+  state.experience.active = active;
+  renderExperience(active, { animate: !enteringWriter });
+  elements.note.textContent = mode === 'focus' ? experienceCopy().focusNote : experienceCopy().pauseNote;
+  updateExperienceControls();
+  updateTimer();
+  updateGarden();
+  // Persist only saved state; inputs with unsaved settings remain drafts.
+  persist();
+  if (enteringWriter) {
+    applyTheme(state.settings.theme);
+    applyColor(state.settings.color);
+    elements.dialog.close();
+    revealWriterDesk();
+  }
+}
+
+function unlockGift() {
+  const unlocked = unlockWriterExperience($('#gift-code').value, state.experience);
+  if (!unlocked) {
+    $('#gift-code').setAttribute('aria-invalid', 'true');
+    $('#gift-feedback').textContent = 'Ese código no abre este regalo. Revisa e intenta otra vez.';
+    $('#gift-code').focus();
+    return;
+  }
+  state.experience.writerUnlocked = unlocked.writerUnlocked;
+  activateExperience('writer');
 }
 
 function discardSettings() {
@@ -345,6 +393,7 @@ function saveSettings(event) {
     alarm: $('#alarm-options input:checked')?.value || DEFAULT_SETTINGS.alarm,
     notifications: notificationsRequested,
     color: selectedColor,
+    theme: $('#theme-select').value,
   };
   if (!interval) {
     activeDuration = modeDuration();
@@ -406,7 +455,23 @@ $$('.color-swatch').forEach((button) => button.addEventListener('click', () => a
 elements.dialog.addEventListener('click', (event) => {
   if (event.target === elements.dialog) discardSettings();
 });
-elements.dialog.addEventListener('cancel', () => applyColor(state.settings.color));
+elements.dialog.addEventListener('cancel', () => {
+  applyColor(state.settings.color);
+  applyTheme(state.settings.theme);
+});
+$('#theme-select').addEventListener('change', (event) => applyTheme(event.target.value));
+$('#experience-select').addEventListener('change', (event) => activateExperience(event.target.value));
+$('#gift-unlock').addEventListener('click', unlockGift);
+$('#gift-code').addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    unlockGift();
+  }
+});
+$('#gift-code').addEventListener('input', () => {
+  $('#gift-code').removeAttribute('aria-invalid');
+  $('#gift-feedback').textContent = '';
+});
 elements.dialog.addEventListener('close', stopAlarmPreview);
 $('#alarm-options').innerHTML = ALARMS.map((alarm) => `
   <div class="alarm-option">
@@ -423,21 +488,26 @@ $('#alarm-options').addEventListener('click', (event) => {
 });
 $('#alarm-options').addEventListener('change', stopAlarmPreview);
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') syncTimerFromClock();
+  if (document.visibilityState === 'visible') {
+    syncTimerFromClock();
+    renderExperience(state.experience.active);
+  }
 });
 window.addEventListener('focus', syncTimerFromClock);
 window.addEventListener('pageshow', syncTimerFromClock);
 window.addEventListener('keydown', (event) => {
-  if (event.code === 'Space' && !['INPUT', 'BUTTON'].includes(document.activeElement.tagName) && !elements.dialog.open) {
+  if (event.code === 'Space' && !['INPUT', 'BUTTON'].includes(document.activeElement.tagName) && !elements.dialog.open && !isWriterRevealOpen()) {
     event.preventDefault();
     startTimer();
   }
 });
 
 applyColor(state.settings.color);
-const dailyQuote = getDailyQuote();
-$('#daily-quote-text').textContent = dailyQuote.text;
-$('#daily-quote-author').textContent = `— ${dailyQuote.author}`;
+applyTheme(state.settings.theme);
+renderExperience(state.experience.active);
+updateExperienceControls();
+elements.note.textContent = mode === 'focus' ? experienceCopy().focusNote : experienceCopy().pauseNote;
 updateTimer();
 updateGarden();
 recoverRunningTimer();
+if (state.experience.active === 'writer') revealWriterDesk();

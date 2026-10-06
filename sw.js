@@ -1,9 +1,10 @@
 // Incrementa esta versión al cambiar los recursos precargados de la aplicación.
-const CACHE_NAME = 'brota-shell-v9';
+const CACHE_NAME = 'brota-shell-v18';
 const APP_FILES = [
   '/',
   '/index.html',
   '/styles.css',
+  '/writer.css',
   '/favicon.svg',
   '/manifest.webmanifest',
   '/icons/icon-192.png',
@@ -14,6 +15,11 @@ const APP_FILES = [
   '/assets/audio/melody.mp3',
   '/src/alarms.js',
   '/src/settings-sections.js',
+  '/src/theme.js',
+  '/src/experiences.js',
+  '/src/writer-quotes.js',
+  '/src/writer-transition.js',
+  '/src/writer-machine.js',
   '/src/main.js',
   '/src/pwa.js',
   '/src/storage.js',
@@ -24,7 +30,7 @@ const APP_FILES = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(APP_FILES))
+      .then((cache) => cache.addAll(APP_FILES.map((path) => new Request(path, { cache: 'reload' }))))
       .then(() => self.skipWaiting()),
   );
 });
@@ -49,7 +55,7 @@ self.addEventListener('fetch', (event) => {
   if (request.mode === 'navigate') {
     event.respondWith((async () => {
       try {
-        const response = await fetch(request);
+        const response = await fetch(request, { cache: 'no-cache' });
         if (response.ok) {
           const cache = await caches.open(CACHE_NAME);
           await cache.put(request, response.clone());

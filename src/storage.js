@@ -1,4 +1,5 @@
 import { DEFAULT_ALARM, isValidAlarm } from './alarms.js';
+import { normalizeExperience } from './experiences.js';
 
 const STORAGE_KEY = 'brota-pomodoro-v1';
 
@@ -8,6 +9,7 @@ export const DEFAULT_SETTINGS = {
   long: 15,
   cycle: 4,
   color: 'sage',
+  theme: 'light',
   sound: true,
   alarm: DEFAULT_ALARM,
   notifications: true,
@@ -19,6 +21,7 @@ const DEFAULT_STATE = {
   sessionsToday: 0,
   date: new Date().toLocaleDateString('en-CA'),
   timer: null,
+  experience: { writerUnlocked: false, active: 'brota' },
 };
 
 function boundedInteger(value, min, max, fallback) {
@@ -36,6 +39,7 @@ function migrateSettings(savedSettings = {}) {
   const settings = {
     ...DEFAULT_SETTINGS,
     ...savedSettings,
+    theme: ['light', 'dark', 'system'].includes(savedSettings.theme) ? savedSettings.theme : DEFAULT_SETTINGS.theme,
     alarm: isValidAlarm(savedSettings.alarm) ? savedSettings.alarm : DEFAULT_ALARM,
     cycle,
     focusDurations: Array.from({ length: 8 }, (_, index) =>
@@ -55,6 +59,7 @@ export function loadState() {
       ...DEFAULT_STATE,
       ...saved,
       settings: migrateSettings(saved.settings),
+      experience: normalizeExperience(saved.experience),
       completed: Math.max(0, Number(saved.completed) || 0),
       sessionsToday: saved.date === today ? Math.max(0, Number(saved.sessionsToday) || 0) : 0,
       date: today,
