@@ -156,3 +156,14 @@ body[data-color=rose] { --accent: #cb8c91; --accent-dark: #a96e75; }body[data-co
 .gift-code-row input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .gift-code-row input[aria-invalid="true"] { border-color: #be776c; }
 .gift-feedback { margin: 0 0 12px; color: var(--muted); font-size: 11px; line-height: 1.6; }
+
+.cycle-reset-action { display: flex; justify-content: center; margin-top: 12px; }
+.cycle-reset-button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; background: transparent; color: var(--muted); font: 500 11px 'DM Sans',sans-serif; cursor: pointer; transition: background .2s, color .2s, border-color .2s; }
+.cycle-reset-button > span { font-size: 17px; line-height: 1; }
+.cycle-reset-button:hover { background: var(--hover); color: var(--accent-dark); border-color: var(--accent); }
+.cycle-reset-button:focus-visible,.cycle-reset-dialog button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.cycle-reset-dialog { width: min(430px,calc(100vw - 30px)); }
+.cycle-reset-description { color: var(--ink); font-size: 13px; line-height: 1.7; margin: 20px 0 12px; }
+.cycle-reset-preserved { color: var(--muted); font-size: 12px; line-height: 1.7; margin: 0 0 24px; }
+.cycle-reset-actions { display: flex; justify-content: flex-end; align-items: center; flex-wrap: wrap; gap: 12px; }
+[data-experience="writer"] .cycle-reset-button { font-family: var(--writer-font); }

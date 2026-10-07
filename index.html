@@ -168,12 +168,22 @@
           </div>
           <div class="garden-footer"><div class="cycle-info"><span class="cycle-icon">↗</span><span id="cycle-label">Tu primer ciclo empieza aquí</span></div><div class="cycle-dots" id="cycle-dots" aria-label="Progreso del ciclo"><span></span><span></span><span></span><span></span></div></div>
           <p class="champion-total" id="champion-total">0 sesiones de enfoque completadas</p>
+          <div class="cycle-reset-action"><button class="cycle-reset-button" id="cycle-reset-open" type="button" aria-haspopup="dialog" aria-controls="cycle-reset-dialog"><span aria-hidden="true">↺</span> Reiniciar ciclo</button></div>
           <div class="garden-tip"><span class="tip-icon">★</span><p><strong>Un pequeño recordatorio</strong><br /><span id="garden-tip-text">Una sesión, una etapa. Completa tu preparación y conquista el cinturón.</span></p></div>
         </aside>
       </main>
 
       <footer class="footer"><span>La constancia conquista.</span><span>Tus datos se quedan en este dispositivo</span></footer>
     </div>
+
+    <dialog class="settings-dialog cycle-reset-dialog" id="cycle-reset-dialog" aria-labelledby="cycle-reset-title" aria-describedby="cycle-reset-description">
+      <div class="settings-card">
+        <div class="dialog-header"><div><p class="section-kicker">UN NUEVO COMIENZO</p><h2 id="cycle-reset-title">¿Reiniciar el ciclo?</h2></div><button class="close-button" id="cycle-reset-close" type="button" aria-label="Cerrar confirmación">×</button></div>
+        <p class="cycle-reset-description" id="cycle-reset-description">Volverás a la primera sesión con su tiempo completo y el reloj detenido. El avance de este ciclo se reiniciará.</p>
+        <p class="cycle-reset-preserved">Tus sesiones completadas, cinturones y tiempos configurados se conservan.</p>
+        <div class="cycle-reset-actions"><button class="cycle-reset-button" id="cycle-reset-cancel" type="button" autofocus>Cancelar</button><button class="save-button" id="cycle-reset-confirm" type="button">Sí, reiniciar ciclo</button></div>
+      </div>
+    </dialog>
 
     <dialog class="settings-dialog" id="settings-dialog" aria-labelledby="settings-title">
       <form method="dialog" class="settings-card" id="settings-form">

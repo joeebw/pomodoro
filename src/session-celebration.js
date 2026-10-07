@@ -80,6 +80,11 @@ export function createSessionCelebration({ getExperience, onDismiss, onRest }) {
   window.addEventListener('pageshow', flush);
 
   return {
+    clear() {
+      pending = null;
+      dismiss();
+      if (dialog.open) dialog.close();
+    },
     request(data) {
       if (!data || !Number.isFinite(data.completed) || data.completed < 1 || !Number.isFinite(data.minutes)) return;
       pending = data;

@@ -5,10 +5,10 @@ import { getExperienceCopy, renderExperience, renderExperienceProgress, unlockWr
 import { ALARMS, playAlarm, stopAlarm } from './alarms.js';
 import { createSettingsSections } from './settings-sections.js';
 import { applyTheme } from './theme.js';
-import { revealWriterDesk, isWriterRevealOpen } from './writer-transition.js';
+import { revealWriterDesk } from './writer-transition.js';
 import { animateWriterMachine, setWriterMachineRunning } from './writer-machine.js';
 import { createSessionCelebration } from './session-celebration.js';
-import { beginChampionshipCycle, championshipView, completeChampionshipStep } from './championship.js';
+import { beginChampionshipCycle, championshipView, completeChampionshipStep, resetChampionshipCycle } from './championship.js';
 import './pwa.js';
 
 const $ = (selector) => document.querySelector(selector);
@@ -18,6 +18,7 @@ const elements = {
   start: $('#start-button'), reset: $('#reset-button'), note: $('#session-note-text'),
   progressCount: $('#progress-count'), cycleLabel: $('#cycle-label'),
   dialog: $('#settings-dialog'), form: $('#settings-form'), toast: $('#toast'), focusDurations: $('#focus-durations'),
+  cycleResetDialog: $('#cycle-reset-dialog'),
 };
 const ringLength = 2 * Math.PI * 147;
 const settingsSections = createSettingsSections(elements.dialog, (section) => {
@@ -250,6 +251,26 @@ function resetTimer() {
   updateTimer();
   elements.note.textContent = experienceCopy().readyNote;
   persist();
+}
+
+function resetCycle() {
+  // Discard the running clock directly: resetting must not complete a session.
+  if (interval) window.clearInterval(interval);
+  interval = null;
+  endsAt = null;
+  celebration.clear();
+  state.celebration = null;
+  stopAlarm();
+  state.championship = resetChampionshipCycle(state.championship, state.settings.cycle);
+  mode = 'focus';
+  activeDuration = modeDuration();
+  remaining = activeDuration;
+  elements.note.textContent = experienceCopy().readyNote;
+  updateTimer();
+  updateGarden();
+  persist();
+  elements.cycleResetDialog.close();
+  showToast('Ciclo reiniciado. Tu primera sesión está lista.');
 }
 
 function showToast(message) {
@@ -495,6 +516,13 @@ $('.mode-switch').addEventListener('click', (event) => {
 });
 elements.start.addEventListener('click', startTimer);
 elements.reset.addEventListener('click', resetTimer);
+$('#cycle-reset-open').addEventListener('click', () => elements.cycleResetDialog.showModal());
+$('#cycle-reset-confirm').addEventListener('click', resetCycle);
+$('#cycle-reset-cancel').addEventListener('click', () => elements.cycleResetDialog.close());
+$('#cycle-reset-close').addEventListener('click', () => elements.cycleResetDialog.close());
+elements.cycleResetDialog.addEventListener('click', (event) => {
+  if (event.target === elements.cycleResetDialog) elements.cycleResetDialog.close();
+});
 $('#settings-open').addEventListener('click', openSettings);
 $('#settings-close').addEventListener('click', discardSettings);
 elements.form.addEventListener('submit', saveSettings);
@@ -546,7 +574,7 @@ document.addEventListener('visibilitychange', () => {
 window.addEventListener('focus', syncTimerFromClock);
 window.addEventListener('pageshow', syncTimerFromClock);
 window.addEventListener('keydown', (event) => {
-  if (event.code === 'Space' && !['INPUT', 'BUTTON', 'A'].includes(document.activeElement.tagName) && !elements.dialog.open && !isWriterRevealOpen() && !celebration.isOpen()) {
+  if (event.code === 'Space' && !['INPUT', 'BUTTON', 'A'].includes(document.activeElement.tagName) && !document.querySelector('dialog[open]')) {
     event.preventDefault();
     startTimer();
   }

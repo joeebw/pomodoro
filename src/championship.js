@@ -30,6 +30,10 @@ export function beginChampionshipCycle(championship, configuredCycle) {
   return { ...championship, target: cycleSize(configuredCycle), victorySize: 0 };
 }
 
+export function resetChampionshipCycle(championship, configuredCycle) {
+  return { ...championship, steps: 0, target: cycleSize(configuredCycle), victorySize: 0 };
+}
+
 export function championshipView(championship) {
   return championship.victorySize
     ? { step: championship.victorySize, target: championship.victorySize, won: true }
