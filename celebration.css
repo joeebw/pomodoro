@@ -1,0 +1,48 @@
+.session-celebration { border: 0; background: transparent; color: var(--ink); padding: 28px; width: min(660px, 100%); max-height: 100dvh; overflow-y: auto; overflow-x: hidden; }
+.session-celebration::backdrop { background: color-mix(in srgb, var(--page) 78%, transparent); backdrop-filter: blur(13px); animation: celebration-backdrop .7s ease both; }
+.celebration-card { position: relative; isolation: isolate; padding: 34px 40px 30px; border: 1px solid var(--line); border-radius: 28px; text-align: center; background: var(--paper); box-shadow: 0 30px 110px color-mix(in srgb, var(--accent) 24%, transparent); animation: celebration-arrive 1s cubic-bezier(.16,1,.3,1) both; }
+.celebration-card::before { content: ''; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: radial-gradient(ellipse at 50% 17%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 60%); }
+.celebration-scene { position: relative; display: grid; place-items: center; width: min(280px,100%); height: 150px; margin: 8px auto 15px; }
+.celebration-halo { position: absolute; width: 140px; height: 140px; border: 1px solid color-mix(in srgb, var(--accent) 38%, transparent); border-radius: 50%; animation: celebration-halo 2.4s ease-out both; }
+.celebration-halo::before,.celebration-halo::after { content: ''; position: absolute; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent); inset: -20px; }
+.celebration-halo::after { inset: -40px; }
+.celebration-particles { position: absolute; inset: 50%; pointer-events: none; }
+.celebration-particles i { position: absolute; display: block; width: 7px; height: 12px; border-radius: 2px; background: var(--arena-gold); opacity: 0; animation: celebration-particle 2.8s calc(.6s + var(--spark-delay)) cubic-bezier(.1,.6,.3,1) both; }
+.celebration-particles i:nth-child(3n) { background: var(--arena-gold-light); border-radius: 50%; width: 5px; height: 5px; }
+.celebration-card h2 { font: 700 clamp(26px, 5vw, 38px)/1.15 Manrope,sans-serif; letter-spacing: -1.3px; margin: 12px 0 8px; }
+.celebration-progress { color: var(--muted); font-size: 12px; margin: 0 0 25px; }
+.celebration-citation { margin: 0; animation: celebration-words .9s .9s both; }
+.celebration-citation blockquote { margin: 0; font: 600 clamp(20px, 4.5vw, 28px)/1.4 Manrope,sans-serif; letter-spacing: -.7px; text-wrap: balance; }
+.celebration-citation blockquote::before { content: '“'; color: var(--accent); }.celebration-citation blockquote::after { content: '”'; color: var(--accent); }
+.celebration-citation figcaption { font-size: 13px; margin: 15px 0 8px; font-weight: 600; }
+.celebration-citation a { color: var(--muted); font-size: 10px; text-underline-offset: 3px; }
+.celebration-next { font-size: 12px; color: var(--muted); line-height: 1.6; margin: 25px auto 18px; }
+.celebration-actions { display: grid; justify-items: center; gap: 12px; }
+.celebration-actions .save-button { padding: 12px 24px; border-radius: 99px; font-size: 13px; }
+.celebration-actions .text-button { font-size: 11px; }
+.session-celebration button:focus-visible,.session-celebration a:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
+@keyframes celebration-backdrop { from { opacity: 0; } to { opacity: 1; } }
+@keyframes celebration-arrive { from { opacity: 0; transform: translateY(35px) scale(.92); } to { opacity: 1; transform: none; } }
+@keyframes celebration-halo { from { opacity: 0; transform: scale(.3) rotate(-30deg); } 50% { opacity: 1; } to { opacity: .55; transform: scale(1) rotate(0); } }
+@keyframes celebration-particle { 0% { opacity: 0; transform: translate(0,0) scale(0); } 15% { opacity: .85; } 100% { opacity: 0; transform: translate(var(--spark-x),var(--spark-y)) rotate(var(--spark-turn)) scale(.6); } }
+@keyframes celebration-words { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@media (max-width: 480px) { .session-celebration { padding: 16px; }.celebration-card { padding: 25px 22px; }.celebration-scene { height: 140px; margin-bottom: 8px; } }
+@media (prefers-reduced-motion: reduce) { .session-celebration::backdrop,.session-celebration *, .session-celebration *::before,.session-celebration *::after { animation: none !important; }.celebration-particles { display: none; } }
+
+.celebration-award { color: var(--accent); font: 700 9px/1.5 Manrope,sans-serif; letter-spacing: 2px; margin: 0; }
+.celebration-emblem { position: relative; width: 100%; z-index: 1; animation: celebration-belt 1s .15s cubic-bezier(.16,1,.3,1) both; filter: drop-shadow(0 8px 15px color-mix(in srgb,var(--arena-gold) 19%,transparent)); }
+.celebration-path { max-width: 290px; margin: 20px auto; }.celebration-path li { background: var(--paper); }.celebration-path li.done { background: var(--arena-gold); }
+.celebration-beam { position: absolute; top: -20px; height: 215px; width: 75px; transform-origin: top center; background: linear-gradient(color-mix(in srgb,var(--arena-gold) 27%,transparent),transparent); filter: blur(10px); animation: celebration-lights 1.4s both; pointer-events: none; }
+.celebration-beam-left { left: 0; transform: rotate(-25deg); }.celebration-beam-right { right: 0; transform: rotate(25deg); }
+.celebration-shine { position: absolute; inset: 25px 0; z-index: 2; pointer-events: none; opacity: 0; background: linear-gradient(115deg,transparent 35%,color-mix(in srgb,var(--arena-gold-light) 60%,transparent) 49%,transparent 63%); }
+.session-celebration[data-victory="true"] .celebration-card { box-shadow: 0 25px 120px color-mix(in srgb,var(--arena-gold) 24%,transparent); }
+.session-celebration[data-victory="true"] .celebration-emblem { animation: championship-belt 2.3s .4s cubic-bezier(.16,1,.3,1) both; }
+.session-celebration[data-victory="true"] .celebration-shine { animation: championship-shine 1.7s 1.7s ease-in-out both; }
+.session-celebration[data-victory="true"] .celebration-halo { border-color: var(--arena-gold); animation-duration: 4s; }
+.session-celebration[data-victory="true"] .celebration-beam { animation-duration: 2.5s; }
+.session-celebration[data-victory="true"] .celebration-citation { animation-delay: 2s; }
+.session-celebration[data-victory="true"] .celebration-particles i { animation-duration: 3s; animation-delay: calc(1s + var(--spark-delay)); }
+@keyframes celebration-belt { from { opacity: 0; transform: translateY(15px) scale(.8); } to { opacity: 1; transform: none; } }
+@keyframes championship-belt { 0% { opacity: 0; transform: perspective(600px) rotateX(50deg) translateY(25px) scale(.6); } 65% { opacity: 1; transform: perspective(600px) rotateX(-5deg) scale(1.07); } 100% { opacity: 1; transform: none; } }
+@keyframes celebration-lights { from { opacity: 0; scale: .5 1; } to { opacity: 1; scale: 1; } }
+@keyframes championship-shine { 0% { opacity: 0; transform: translateX(-80%); } 45% { opacity: .65; } 100% { opacity: 0; transform: translateX(80%); } }

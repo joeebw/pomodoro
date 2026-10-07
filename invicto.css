@@ -1,0 +1,147 @@
+/* The arena shares the timer structure; the literary experience keeps its own skin. */
+:root[data-experience="brota"] {
+  --page: #f5f1e8;
+  --paper: #fffcf5;
+  --surface: #fffef9;
+  --hover: #ece6da;
+  --ink: #222629;
+  --muted: #6e706d;
+  --line: #ded7c8;
+  --ring: #ded7c8;
+  --shadow: 0 16px 45px #22262908;
+}
+:root[data-experience="brota"][data-theme="dark"] {
+  --page: #111417;
+  --paper: #1b1e20;
+  --surface: #222629;
+  --hover: #2c3033;
+  --ink: #f4eee4;
+  --muted: #b0b1ab;
+  --line: #34383b;
+  --ring: #34383b;
+  --shadow: 0 16px 45px #00000018;
+}
+/* Retain the saved color IDs so existing preferences survive the new palettes. */
+:root[data-experience="brota"] body {
+  --metal: #d8b977;
+  --metal-highlight: #f3e3b9;
+  --metal-shadow: #96702e;
+  --accent: var(--metal-shadow);
+  --accent-dark: var(--metal-shadow);
+  --button-ink: #111417;
+  --arena-gold: var(--metal);
+  --arena-gold-light: var(--metal-highlight);
+  --arena-surface: #171b1e;
+  --page-glow: color-mix(in srgb, var(--metal) 5%, transparent);
+}
+:root[data-experience="brota"] body[data-color="rose"] {
+  --metal: #d49a76;
+  --metal-highlight: #f3d5be;
+  --metal-shadow: #915936;
+  --accent: var(--metal-shadow);
+  --accent-dark: var(--metal-shadow);
+}
+:root[data-experience="brota"] body[data-color="lavender"] {
+  --metal: #c3c9d0;
+  --metal-highlight: #f0f3f6;
+  --metal-shadow: #626d78;
+  --accent: var(--metal-shadow);
+  --accent-dark: var(--metal-shadow);
+}
+:root[data-experience="brota"] body[data-color="ocean"] {
+  --metal: #87aeca;
+  --metal-highlight: #d0e4f2;
+  --metal-shadow: #386985;
+  --accent: var(--metal-shadow);
+  --accent-dark: var(--metal-shadow);
+}
+:root[data-experience="brota"][data-theme="dark"] body,
+:root[data-experience="brota"][data-theme="dark"] body[data-color] {
+  --accent: var(--metal);
+  --accent-dark: var(--metal-highlight);
+}
+[data-experience="brota"] .brand { font-size: 20px; letter-spacing: 2px; gap: 12px; }
+[data-experience="brota"] .brand-mark { display: block; width: 32px; height: 32px; }
+[data-experience="brota"] .brand-mark svg { display: block; width: 100%; height: 100%; }
+[data-experience="brota"] .topbar { height: 88px; }
+[data-experience="brota"] .main-layout { grid-template-columns: minmax(0, 1fr) 400px; gap: 64px; padding: 48px 0; }
+[data-experience="brota"] .focus-panel { min-width: 0; }
+[data-experience="brota"] .eyebrow { font-size: 9px; letter-spacing: 2.1px; margin-bottom: 20px; }
+[data-experience="brota"] .daily-quote { width: min(100%, 540px); margin-bottom: 26px; min-height: 108px; }
+[data-experience="brota"] .daily-quote blockquote { font-weight: 700; line-height: 1.28; letter-spacing: -1px; text-wrap: balance; overflow-wrap: break-word; }
+[data-experience="brota"] .daily-quote figcaption { color: var(--accent); font-size: 12px; margin-top: 13px; }
+[data-experience="brota"] .daily-quote .reading-source { color: var(--muted); text-underline-offset: 3px; }
+[data-experience="brota"] .mode-switch { border-radius: 10px; background: var(--paper); padding: 4px; }
+[data-experience="brota"] .mode { border-radius: 6px; padding: 9px 14px; }
+[data-experience="brota"] .mode.active { background: var(--hover); color: var(--ink); box-shadow: none; }
+[data-experience="brota"] .timer-wrap { width: 320px; height: 320px; margin: 27px auto 24px; }
+[data-experience="brota"] .ring-progress { stroke-width: 3; }
+[data-experience="brota"] .timer-time { font-size: 76px; font-weight: 800; letter-spacing: -4px; }
+[data-experience="brota"] .timer-caption { letter-spacing: .5px; margin-top: 13px; }
+[data-experience="brota"] .primary-button,
+[data-experience="brota"] .save-button { background: var(--metal); color: var(--button-ink); border-radius: 9px; box-shadow: none; font-weight: 700; }
+[data-experience="brota"] .primary-button:hover,
+[data-experience="brota"] .save-button:hover { background: var(--metal-highlight); box-shadow: none; }
+[data-experience="brota"] .primary-button { height: 50px; min-width: 204px; }
+[data-experience="brota"] .reset-button,
+[data-experience="brota"] .icon-button { border-radius: 9px; }
+[data-experience="brota"] .note-sparkle { color: var(--accent); }
+[data-experience="brota"] .session-note { line-height: 1.6; }
+[data-experience="brota"] .garden-panel { border-radius: 14px; padding: 28px 25px 23px; }
+[data-experience="brota"] .garden-heading h2 { font-weight: 700; font-size: 25px; max-width: 260px; }
+[data-experience="brota"] .garden-sun { border-radius: 9px; color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--paper)); flex-shrink: 0; }
+[data-experience="brota"] .garden-scene { border-radius: 10px; height: 292px; background: radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--metal) 15%, transparent), transparent 70%), var(--arena-surface); border-color: color-mix(in srgb, var(--metal) 25%, transparent); }
+[data-experience="brota"] .garden-caption { color: #d6d8d5; padding: 0 10px; font-size: 10px; text-align: center; }
+[data-experience="brota"] .champion-edition { color: #b9bebf; }
+[data-experience="brota"] .garden-footer { justify-content: center; height: 42px; border-bottom: 0; }
+[data-experience="brota"] .cycle-info { font-size: 10px; }
+[data-experience="brota"] .champion-total { margin: 0; padding: 0 0 15px; border-bottom: 1px solid var(--line); }
+[data-experience="brota"] .tip-icon { color: var(--accent); }
+[data-experience="brota"] .garden-tip p { font-size: 11px; }
+[data-experience="brota"] .footer { font-size: 10px; }
+[data-experience="brota"] .settings-dialog,
+[data-experience="brota"] .install-dialog { border-radius: 14px; box-shadow: 0 28px 90px #00000035; }
+[data-experience="brota"] .settings-dialog::backdrop,
+[data-experience="brota"] .install-dialog::backdrop { background: #11141799; backdrop-filter: blur(7px); }
+[data-experience="brota"] .alarm-preview { border-radius: 7px; }
+[data-experience="brota"] .color-swatch { background: #d8b977; width: 24px; height: 24px; }
+[data-experience="brota"] .color-swatch[data-color="rose"] { background: #d49a76; }
+[data-experience="brota"] .color-swatch[data-color="lavender"] { background: #c3c9d0; }
+[data-experience="brota"] .color-swatch[data-color="ocean"] { background: #87aeca; }
+[data-experience="brota"] .color-swatch.selected { outline-color: var(--accent); }
+[data-experience="brota"] .toast { background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); }
+[data-experience="brota"] .celebration-card { border-radius: 16px; }
+[data-experience="brota"] .celebration-award { color: var(--accent); }
+[data-experience="brota"] .celebration-path li { color: var(--muted); border-color: var(--line); }
+[data-experience="brota"] .celebration-path li.done { background: var(--metal); color: var(--button-ink); border-color: var(--metal); }
+[data-experience="brota"] :is(button, a):focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+[data-experience="writer"] .brand { font-size: 19px; }
+@media (max-width: 1050px) {
+  [data-experience="brota"] .main-layout { grid-template-columns: minmax(0, 1fr) 350px; gap: 36px; }
+  [data-experience="brota"] .garden-panel { padding: 25px 21px 21px; }
+}
+@media (max-width: 760px) {
+  [data-experience="brota"] .topbar { height: 76px; }
+  [data-experience="brota"] .main-layout { display: flex; gap: 36px; padding: 34px 0; }
+  [data-experience="brota"] .focus-panel { width: 100%; }
+  [data-experience="brota"] .daily-quote { min-height: 0; margin-bottom: 25px; }
+  [data-experience="brota"] .daily-quote blockquote { font-size: clamp(25px, 6.5vw, 34px); }
+  [data-experience="brota"] .timer-wrap { width: 286px; height: 286px; margin: 23px auto; }
+  [data-experience="brota"] .timer-time { font-size: 68px; }
+  [data-experience="brota"] .garden-panel { width: min(100%, 430px); }
+}
+@media (max-width: 480px) {
+  [data-experience="brota"] .topbar-right { gap: 10px; }
+  [data-experience="brota"] .brand { font-size: 16px; letter-spacing: 1.4px; gap: 8px; }
+  [data-experience="brota"] .brand-mark { width: 28px; height: 28px; }
+  [data-experience="brota"] .streak { gap: 4px; }
+  [data-experience="brota"] .streak-label { display: none; }
+  [data-experience="writer"] .topbar { flex-wrap: wrap; height: auto; min-height: 90px; gap: 8px; padding: 16px 0; }
+  [data-experience="writer"] .topbar-right { gap: 12px; }
+}
+@media (max-width: 380px) {
+  [data-experience="brota"] .timer-wrap { width: 260px; height: 260px; }
+  [data-experience="brota"] .timer-time { font-size: 62px; }
+  [data-experience="brota"] .mode { padding: 9px 11px; }
+  [data-experience="brota"] .garden-panel { padding: 23px 18px 20px; }
+}

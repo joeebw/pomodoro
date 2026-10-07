@@ -1,14 +1,18 @@
 // Incrementa esta versión al cambiar los recursos precargados de la aplicación.
-const CACHE_NAME = 'brota-shell-v18';
+const CACHE_NAME = 'brota-shell-v21';
 const APP_FILES = [
   '/',
   '/index.html',
   '/styles.css',
   '/writer.css',
+  '/celebration.css',
+  '/champion.css',
+  '/invicto.css',
   '/favicon.svg',
   '/manifest.webmanifest',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
+  '/icons/icon-maskable-512.png',
   '/icons/apple-touch-icon.png',
   '/assets/audio/bells.mp3',
   '/assets/audio/flute.mp3',
@@ -16,6 +20,7 @@ const APP_FILES = [
   '/src/alarms.js',
   '/src/settings-sections.js',
   '/src/theme.js',
+  '/src/brand.js',
   '/src/experiences.js',
   '/src/writer-quotes.js',
   '/src/writer-transition.js',
@@ -25,6 +30,10 @@ const APP_FILES = [
   '/src/storage.js',
   '/src/timer.js',
   '/src/quotes.js',
+  '/src/athlete-quotes.js',
+  '/src/session-celebration.js',
+  '/src/championship.js',
+  '/src/champion-art.js',
 ];
 
 self.addEventListener('install', (event) => {

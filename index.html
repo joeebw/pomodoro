@@ -1,26 +1,26 @@
 <!doctype html>
-<html lang="es">
+<html lang="es" data-theme="dark" data-experience="brota">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f5f3ed" />
-    <meta name="description" content="Un espacio tranquilo para concentrarte, una sesión a la vez." />
+    <meta name="theme-color" content="#111417" />
+    <meta name="description" content="Entrena tu enfoque. Recorre el camino del campeón, una etapa a la vez." />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="brota" />
-    <title>brota — tiempo para ti</title>
+    <meta name="apple-mobile-web-app-title" content="INVICTO" />
+    <title>INVICTO — conquista tu enfoque</title>
     <script>
       // Apply the saved theme before painting the page.
       try {
         const saved = JSON.parse(localStorage.getItem('brota-pomodoro-v1'));
-        const theme = saved?.settings?.theme;
+        const theme = saved && typeof saved === 'object' ? (saved.settings?.theme || 'light') : 'dark';
         const dark = theme === 'dark' || (theme === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
         document.documentElement.dataset.theme = dark ? 'dark' : 'light';
         const experience = saved?.experience;
         const writer = experience?.writerUnlocked === true && experience?.active === 'writer';
         document.documentElement.dataset.experience = writer ? 'writer' : 'brota';
-        document.querySelector('meta[name="theme-color"]').content = writer ? (dark ? '#211d19' : '#f5f0e6') : (dark ? '#151e19' : '#f5f3ed');
-      } catch { /* Use the default light theme if storage is unavailable. */ }
+        document.querySelector('meta[name="theme-color"]').content = writer ? (dark ? '#211d19' : '#f5f0e6') : (dark ? '#111417' : '#f5f1e8');
+      } catch { /* Use the default dark theme if storage is unavailable. */ }
     </script>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
@@ -30,14 +30,17 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="writer.css" />
+    <link rel="stylesheet" href="champion.css" />
+    <link rel="stylesheet" href="celebration.css" />
+    <link rel="stylesheet" href="invicto.css" />
   </head>
   <body>
     <div class="app-shell">
       <header class="topbar">
-        <a class="brand" href="#" aria-label="Brota, inicio"><span class="brand-mark" aria-hidden="true">✳</span><span id="brand-name">brota</span></a>
+        <a class="brand" href="#" aria-label="INVICTO, inicio"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M10 2h12l8 8v12l-8 8H10l-8-8V10Z" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M12 9h8v3h-2v8h2v3h-8v-3h2v-8h-2Z" fill="currentColor"/></svg></span><span id="brand-name">INVICTO</span></a>
         <div class="topbar-right">
-          <div class="streak"><span id="progress-icon" aria-hidden="true">✿</span><span id="plant-count">0</span><span class="streak-label" id="progress-label">plantas</span></div>
-          <button class="icon-button install-button" id="install-app" type="button" aria-label="Instalar Brota" title="Instalar Brota" hidden>
+          <div class="streak"><span id="progress-icon" aria-hidden="true">★</span><span id="progress-count">0</span><span class="streak-label" id="progress-label">cinturones</span></div>
+          <button class="icon-button install-button" id="install-app" type="button" aria-label="Instalar INVICTO" title="Instalar INVICTO" hidden>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4"/><path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></svg>
           </button>
           <button class="icon-button" id="settings-open" aria-label="Abrir ajustes" title="Ajustes">
@@ -97,7 +100,7 @@
               <path d="M86 397H554L549 418Q547 430 532 430H108Q93 430 91 419Z" fill="url(#machine-front)"/>
               <rect x="222" y="389" width="196" height="13" rx="6" fill="#dbd2bb" stroke="#aaa087"/>
               <rect x="274" y="410" width="92" height="13" rx="3" fill="#ab9870"/>
-              <text x="320" y="420" text-anchor="middle" fill="#26352c" font-family="serif" font-size="9" letter-spacing="4">BROTA</text>
+              <text x="320" y="420" text-anchor="middle" fill="#26352c" font-family="serif" font-size="9" letter-spacing="4">INVICTO</text>
               <g fill="#17231d"><rect x="113" y="429" width="37" height="9" rx="4"/><rect x="490" y="429" width="37" height="9" rx="4"/></g>
             </svg>
             <svg class="timer-ring" viewBox="0 0 320 320" aria-hidden="true">
@@ -111,36 +114,27 @@
           </div>
 
           <div class="timer-actions">
-            <button class="primary-button" id="start-button"><span class="play-icon" aria-hidden="true">▶</span><span>Comenzar sesión</span></button>
+            <button class="primary-button" id="start-button"><span class="play-icon" aria-hidden="true">▶</span><span>Comenzar etapa</span></button>
             <button class="reset-button" id="reset-button" aria-label="Reiniciar temporizador" title="Reiniciar">↺</button>
           </div>
-          <div class="session-note"><span class="note-sparkle">✦</span><span id="session-note-text">Un paso a la vez. Tu planta te acompaña.</span></div>
+          <div class="session-note"><span class="note-sparkle">✦</span><span id="session-note-text">Entrena tu enfoque. Construye tu próxima victoria.</span></div>
         </section>
 
-        <aside class="garden-panel" aria-label="Tu jardín">
+        <aside class="garden-panel" aria-label="Tu preparación">
           <section class="writer-reading" aria-label="Escrito del día">
             <div class="reading-heading"><span>ESCRITO DEL DÍA</span><time id="reading-date"></time></div>
             <span class="reading-ornament" aria-hidden="true">“</span>
             <div id="writer-reading-home"></div>
             <div class="reading-end" aria-hidden="true">✦</div>
           </section>
-          <div class="garden-heading"><div><p class="section-kicker" id="garden-kicker">TU JARDÍN</p><h2 id="garden-title">Algo bonito<br />está creciendo.</h2></div><span class="garden-sun" aria-hidden="true">☼</span></div>
+          <div class="garden-heading"><div><p class="section-kicker" id="garden-kicker">TU PREPARACIÓN</p><h2 id="garden-title">El campeonato<br />empieza contigo.</h2></div><span class="garden-sun" aria-hidden="true">★</span></div>
           <div class="garden-scene" id="garden-scene">
-            <div class="scene-sky"><span class="cloud cloud-one"></span><span class="cloud cloud-two"></span><span class="tiny-bird">⌁</span></div>
-            <div class="plant-stage" id="plant-stage" aria-label="Una semilla lista para crecer">
-              <div class="plant-glow"></div>
-              <svg class="plant-illustration seedling" id="plant-art" viewBox="0 0 180 210" role="img" aria-label="Semilla">
-                <ellipse class="plant-shadow" cx="90" cy="187" rx="54" ry="8" />
-                <path class="pot-rim" d="M50 145h80l-9 42H59z" />
-                <path class="pot-body" d="M55 151h70l-8 35H63z" />
-                <path class="pot-highlight" d="M61 157h7l5 25h-7z" />
-                <path class="soil" d="M52 145q38-9 76 0l-4 9H56z" />
-                <path class="stem" d="M90 147c0-18 1-31 0-44" />
-                <path class="leaf leaf-left" d="M91 120C62 119 57 96 64 84c20 1 31 14 27 36Z" />
-                <path class="leaf leaf-right" d="M91 108c2-24 23-33 37-26 0 20-15 32-37 26Z" />
-                <path class="leaf-vein" d="M89 117 68 91m24 13 26-15" />
-              </svg>
-              <div class="sparkle sparkle-a">✦</div><div class="sparkle sparkle-b">✧</div>
+            <div class="champion-stage" id="champion-stage" role="group" aria-label="Tu preparación para el campeonato">
+              <div class="arena-beam beam-left" aria-hidden="true"></div><div class="arena-beam beam-right" aria-hidden="true"></div>
+              <p class="champion-edition">DISCIPLINA · CONFIANZA · CONSTANCIA</p>
+              <div class="champion-belt" aria-hidden="true"></div>
+              <p class="champion-stage-label" id="champion-stage-label">EL CAMINO DEL CAMPEÓN</p>
+              <ol class="champion-path" aria-label="Etapas de tu preparación"></ol>
             </div>
             <div class="manuscript-stage" id="manuscript-stage" data-stage="0" role="img" aria-label="Una hoja en blanco" hidden>
               <svg class="manuscript-art" viewBox="0 0 260 245" aria-hidden="true">
@@ -170,15 +164,15 @@
                 <text class="manuscript-page-number" x="121" y="194">01</text>
               </svg>
             </div>
-            <div class="ground"></div>
-            <div class="garden-caption"><span class="caption-dot"></span><span id="plant-caption">Una semilla llena de posibilidades</span></div>
+            <div class="garden-caption"><span class="caption-dot"></span><span id="progress-caption">Tu primera conquista empieza aquí</span></div>
           </div>
           <div class="garden-footer"><div class="cycle-info"><span class="cycle-icon">↗</span><span id="cycle-label">Tu primer ciclo empieza aquí</span></div><div class="cycle-dots" id="cycle-dots" aria-label="Progreso del ciclo"><span></span><span></span><span></span><span></span></div></div>
-          <div class="garden-tip"><span class="tip-icon">✿</span><p><strong>Un pequeño recordatorio</strong><br /><span id="garden-tip-text">Cada minuto de enfoque ayuda a tu planta a crecer. Cuídala a tu ritmo.</span></p></div>
+          <p class="champion-total" id="champion-total">0 sesiones de enfoque completadas</p>
+          <div class="garden-tip"><span class="tip-icon">★</span><p><strong>Un pequeño recordatorio</strong><br /><span id="garden-tip-text">Una sesión, una etapa. Completa tu preparación y conquista el cinturón.</span></p></div>
         </aside>
       </main>
 
-      <footer class="footer"><span>Hecho con calma <span class="footer-heart">♥</span></span><span>Tus datos se quedan en este dispositivo</span></footer>
+      <footer class="footer"><span>La constancia conquista.</span><span>Tus datos se quedan en este dispositivo</span></footer>
     </div>
 
     <dialog class="settings-dialog" id="settings-dialog" aria-labelledby="settings-title">
@@ -198,7 +192,7 @@
           </div>
         </details>
         <div class="appearance-setting"><div><strong>Color de acento</strong><small>Elige tu tono favorito</small></div><div class="color-options" role="radiogroup" aria-label="Color de acento">
-          <button type="button" class="color-swatch selected" data-color="sage" aria-label="Verde salvia" aria-checked="true" role="radio"></button><button type="button" class="color-swatch" data-color="rose" aria-label="Rosa suave" aria-checked="false" role="radio"></button><button type="button" class="color-swatch" data-color="lavender" aria-label="Lavanda" aria-checked="false" role="radio"></button><button type="button" class="color-swatch" data-color="ocean" aria-label="Azul océano" aria-checked="false" role="radio"></button>
+          <button type="button" class="color-swatch selected" data-color="sage" aria-label="Oro" aria-checked="true" role="radio"></button><button type="button" class="color-swatch" data-color="rose" aria-label="Cobre" aria-checked="false" role="radio"></button><button type="button" class="color-swatch" data-color="lavender" aria-label="Plata" aria-checked="false" role="radio"></button><button type="button" class="color-swatch" data-color="ocean" aria-label="Azul acero" aria-checked="false" role="radio"></button>
         </div></div>
         <label class="setting-row" for="theme-select">
           <span><strong>Apariencia</strong><small>Elige la luz de tu espacio</small></span>
@@ -211,7 +205,7 @@
         <label class="setting-row" id="experience-setting" for="experience-select" hidden>
           <span><strong>Tu espacio</strong><small>Se guarda al elegirlo</small></span>
           <select class="theme-select" id="experience-select">
-            <option value="brota">Brota</option>
+            <option value="brota">INVICTO</option>
             <option value="writer">Escritor</option>
           </select>
         </label>
@@ -243,7 +237,7 @@
     </dialog>
     <dialog class="install-dialog" id="install-dialog" aria-labelledby="install-title">
       <div class="install-card">
-        <div class="dialog-header"><div><p class="section-kicker">BROTA CONTIGO</p><h2 id="install-title">Instala Brota</h2></div><button class="close-button" id="install-close" type="button" aria-label="Cerrar instrucciones">×</button></div>
+        <div class="dialog-header"><div><p class="section-kicker">INVICTO CONTIGO</p><h2 id="install-title">Instala INVICTO</h2></div><button class="close-button" id="install-close" type="button" aria-label="Cerrar instrucciones">×</button></div>
         <p class="install-instructions" id="install-instructions"></p>
         <button class="save-button install-dismiss" id="install-dismiss" type="button">Entendido</button>
       </div>
@@ -254,7 +248,7 @@
       <p class="visually-hidden" id="writer-reveal-description">Tres hojas para comenzar. Puedes saltar la presentación o pulsar Escape.</p>
       <div class="reveal-deck" aria-live="polite" aria-atomic="true">
         <article class="reveal-paper">
-          <span class="reveal-edition">BROTA · EDICIÓN ESCRITOR</span>
+          <span class="reveal-edition">INVICTO · EDICIÓN ESCRITOR</span>
           <span class="reveal-nib" aria-hidden="true">✒</span>
           <h3></h3>
           <p></p>
@@ -262,7 +256,7 @@
           <a class="reveal-signature" target="_blank" rel="noopener noreferrer"></a>
         </article>
         <article class="reveal-paper" hidden>
-          <span class="reveal-edition">BROTA · EDICIÓN ESCRITOR</span>
+          <span class="reveal-edition">INVICTO · EDICIÓN ESCRITOR</span>
           <span class="reveal-nib" aria-hidden="true">❧</span>
           <h3></h3>
           <p></p>
@@ -270,7 +264,7 @@
           <a class="reveal-signature" target="_blank" rel="noopener noreferrer"></a>
         </article>
         <article class="reveal-paper" hidden>
-          <span class="reveal-edition">BROTA · EDICIÓN ESCRITOR</span>
+          <span class="reveal-edition">INVICTO · EDICIÓN ESCRITOR</span>
           <span class="reveal-nib" aria-hidden="true">✒</span>
           <h3></h3>
           <p></p>
@@ -279,6 +273,31 @@
         </article>
       </div>
       <button id="writer-reveal-skip" class="reveal-skip" type="button" autofocus>Entrar al escritorio <span aria-hidden="true">↗</span></button>
+    </dialog>
+    <dialog class="session-celebration" id="session-celebration" aria-labelledby="celebration-title" aria-describedby="celebration-quote celebration-progress">
+      <div class="celebration-card">
+        <p class="section-kicker">UNA SESIÓN. UN PASO MÁS.</p>
+        <div class="celebration-scene" aria-hidden="true">
+          <div class="celebration-halo"></div>
+          <div class="celebration-particles"></div>
+          <div class="celebration-beam celebration-beam-left"></div><div class="celebration-beam celebration-beam-right"></div>
+          <div class="celebration-emblem"></div><div class="celebration-shine"></div>
+        </div>
+        <p class="celebration-award" id="celebration-award"></p>
+        <h2 id="celebration-title">Etapa conquistada.</h2>
+        <ol class="champion-path celebration-path" aria-label="Progreso de esta preparación"></ol>
+        <p class="celebration-progress" id="celebration-progress"></p>
+        <figure class="celebration-citation">
+          <blockquote id="celebration-quote"></blockquote>
+          <figcaption id="celebration-author"></figcaption>
+          <a id="celebration-source" target="_blank" rel="noopener noreferrer"></a>
+        </figure>
+        <p class="celebration-next">Tu preparación avanza. Recupera energía y vuelve por la siguiente etapa.</p>
+        <div class="celebration-actions">
+          <button id="celebration-rest" class="save-button" type="button" autofocus>Disfrutar mi descanso</button>
+          <button id="celebration-close" class="text-button" type="button">Volver al temporizador</button>
+        </div>
+      </div>
     </dialog>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script type="module" src="src/main.js"></script>

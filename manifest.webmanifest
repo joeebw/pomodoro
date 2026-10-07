@@ -1,15 +1,18 @@
 {
   "id": "/",
-  "name": "brota — Pomodoro y jardín personal",
-  "short_name": "brota",
-  "description": "Un espacio tranquilo para concentrarte, una sesión a la vez.",
+  "name": "INVICTO — El camino del campeón",
+  "short_name": "INVICTO",
+  "description": "Entrena tu enfoque y conquista tu próximo cinturón, una etapa a la vez.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#f5f3ed",
-  "theme_color": "#f5f3ed",
+  "background_color": "#111417",
+  "theme_color": "#111417",
   "orientation": "any",
-  "categories": ["productivity", "lifestyle"],
+  "categories": [
+    "productivity",
+    "lifestyle"
+  ],
   "icons": [
     {
       "src": "/icons/icon-192.png",
@@ -24,7 +27,7 @@
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-512.png",
+      "src": "/icons/icon-maskable-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"

@@ -15,7 +15,3 @@ export function formatTime(seconds) {
   const safeSeconds = Math.max(0, Math.ceil(seconds));
   return `${String(Math.floor(safeSeconds / 60)).padStart(2, '0')}:${String(safeSeconds % 60).padStart(2, '0')}`;
 }
-
-export function getPlantStage(completed) {
-  return completed === 0 ? 0 : ((completed - 1) % 4) + 1;
-}

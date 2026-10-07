@@ -1,3 +1,5 @@
+import { APP_NAME } from './brand.js';
+
 const installButton = document.querySelector('#install-app');
 const installDialog = document.querySelector('#install-dialog');
 const installInstructions = document.querySelector('#install-instructions');
@@ -21,7 +23,7 @@ function installationInstructions() {
   const isSafari = /Safari/i.test(userAgent) && !/Chrome|CriOS|Edg|OPR|FxiOS/i.test(userAgent);
 
   if (isIos && isSafari) {
-    return 'En Safari, toca Compartir y elige «Añadir a pantalla de inicio» para tener Brota junto a tus apps.';
+    return `En Safari, toca Compartir y elige «Añadir a pantalla de inicio» para tener ${APP_NAME} junto a tus apps.`;
   }
   if (isIos) {
     return 'Abre esta página en Safari, toca Compartir y elige «Añadir a pantalla de inicio».';
@@ -29,7 +31,7 @@ function installationInstructions() {
   if (/Macintosh/i.test(userAgent) && isSafari) {
     return 'En Safari, abre el menú Archivo y elige «Añadir al Dock».';
   }
-  return 'Abre el menú de tu navegador y elige «Instalar Brota» o «Añadir a pantalla de inicio». Si no aparece, prueba con Chrome o Edge.';
+  return `Abre el menú de tu navegador y elige «Instalar ${APP_NAME}» o «Añadir a pantalla de inicio». Si no aparece, prueba con Chrome o Edge.`;
 }
 
 async function installApp() {
@@ -68,7 +70,7 @@ updateInstallButton();
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch((error) => {
-      console.error('No se pudo registrar el service worker de Brota:', error);
+      console.error(`No se pudo registrar el service worker de ${APP_NAME}:`, error);
     });
   });
 }

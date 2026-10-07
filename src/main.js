@@ -1,3 +1,4 @@
+import { APP_NAME, experienceName } from './brand.js';
 import { DEFAULT_SETTINGS, loadState, saveState } from './storage.js';
 import { durationFor, formatTime, MODES } from './timer.js';
 import { getExperienceCopy, renderExperience, renderExperienceProgress, unlockWriterExperience } from './experiences.js';
@@ -6,6 +7,8 @@ import { createSettingsSections } from './settings-sections.js';
 import { applyTheme } from './theme.js';
 import { revealWriterDesk, isWriterRevealOpen } from './writer-transition.js';
 import { animateWriterMachine, setWriterMachineRunning } from './writer-machine.js';
+import { createSessionCelebration } from './session-celebration.js';
+import { beginChampionshipCycle, championshipView, completeChampionshipStep } from './championship.js';
 import './pwa.js';
 
 const $ = (selector) => document.querySelector(selector);
@@ -13,7 +16,7 @@ const $$ = (selector) => [...document.querySelectorAll(selector)];
 const elements = {
   timer: $('#timer'), ring: $('#ring-progress'), label: $('#session-label'), caption: $('#timer-caption'),
   start: $('#start-button'), reset: $('#reset-button'), note: $('#session-note-text'),
-  plantCount: $('#plant-count'), cycleLabel: $('#cycle-label'),
+  progressCount: $('#progress-count'), cycleLabel: $('#cycle-label'),
   dialog: $('#settings-dialog'), form: $('#settings-form'), toast: $('#toast'), focusDurations: $('#focus-durations'),
 };
 const ringLength = 2 * Math.PI * 147;
@@ -24,7 +27,7 @@ let state = loadState();
 const experienceCopy = () => getExperienceCopy(state.experience.active);
 let mode = state.timer?.mode || 'focus';
 let focusDurationDrafts = [...state.settings.focusDurations];
-const sessionIndex = () => state.sessionsToday % state.settings.cycle;
+const sessionIndex = () => state.championship.steps;
 const modeDuration = (targetMode = mode) => durationFor(targetMode, state.settings, sessionIndex());
 let activeDuration = state.timer?.duration || modeDuration();
 let endsAt = state.timer?.endsAt || null;
@@ -32,10 +35,41 @@ let remaining = endsAt ? Math.max(0, endsAt - Date.now()) / 1000 : activeDuratio
 let interval = null;
 let toastTimeout = null;
 let previewButton = null;
+const celebration = createSessionCelebration({
+  getExperience: () => state.experience.active,
+  onDismiss: () => {
+    state.celebration = null;
+    stopAlarm();
+    persist();
+  },
+  onRest: () => {
+    if (mode === 'short' || mode === 'long') startTimer();
+  },
+});
 
 function persist() {
+  if (refreshToday()) updateGarden();
   state.timer = interval && endsAt ? { mode, endsAt, duration: activeDuration } : null;
   saveState(state);
+}
+
+function refreshToday() {
+  const today = new Date().toLocaleDateString('en-CA');
+  if (state.date === today) return false;
+  state.date = today;
+  state.sessionsToday = 0;
+  return true;
+}
+
+function scheduleDayRefresh() {
+  const now = new Date();
+  const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+  window.setTimeout(() => {
+    refreshToday();
+    updateGarden();
+    persist();
+    scheduleDayRefresh();
+  }, midnight.getTime() - now.getTime() + 100);
 }
 
 function updateTimer() {
@@ -45,28 +79,27 @@ function updateTimer() {
   elements.ring.style.strokeDashoffset = ringLength * (1 - Math.max(0, remaining / activeDuration));
   elements.label.textContent = experienceCopy().modes[mode].label;
   elements.caption.textContent = experienceCopy().modes[mode].caption;
-  elements.start.innerHTML = interval
-    ? '<span class="pause-icon" aria-hidden="true">Ⅱ</span><span>Pausar sesión</span>'
-    : '<span class="play-icon" aria-hidden="true">▶</span><span>Comenzar sesión</span>';
+  const activity = state.experience.active === 'writer' ? 'sesión' : mode === 'focus' ? 'etapa' : 'descanso';
+  const action = interval ? 'Pausar' : remaining < activeDuration ? 'Continuar' : 'Comenzar';
+  elements.start.innerHTML = `<span class="${interval ? 'pause-icon' : 'play-icon'}" aria-hidden="true">${interval ? 'Ⅱ' : '▶'}</span><span>${action} ${activity}</span>`;
   $$('.mode').forEach((button) => {
     const active = button.dataset.mode === mode;
     button.classList.toggle('active', active);
     button.setAttribute('aria-selected', String(active));
   });
-  document.title = `${formatTime(remaining)} · ${state.experience.active === 'writer' ? 'brota / escritor' : 'brota'}`;
+  document.title = `${formatTime(remaining)} · ${experienceName(state.experience.active)}`;
 }
 
 function updateGarden() {
-  renderExperienceProgress(state.experience.active, state.completed);
-  elements.plantCount.textContent = state.completed;
-  elements.cycleLabel.textContent = state.sessionsToday === 0
-    ? 'Tu primer ciclo empieza aquí'
-    : `${state.sessionsToday} de ${state.settings.cycle} sesiones de hoy`;
-  const cycleProgress = state.sessionsToday === 0
-    ? 0
-    : (state.sessionsToday % state.settings.cycle || state.settings.cycle);
-  $('#cycle-dots').innerHTML = Array.from({ length: state.settings.cycle }, (_, index) =>
-    `<span class="${index < cycleProgress ? 'done' : ''}"></span>`,
+  const view = championshipView(state.championship);
+  renderExperienceProgress(state.experience.active, state.completed, state.championship, view);
+  elements.progressCount.textContent = state.experience.active === 'writer' ? state.completed : state.championship.belts;
+  $('.streak').setAttribute('aria-label', state.experience.active === 'writer'
+    ? `${state.completed} sesiones completadas`
+    : `${state.championship.belts} cinturones conquistados`);
+  elements.cycleLabel.textContent = `${state.sessionsToday} sesiones hoy · ${view.step} de ${view.target} en el ciclo`;
+  $('#cycle-dots').innerHTML = Array.from({ length: view.target }, (_, index) =>
+    `<span class="${index < view.step ? 'done' : ''}"></span>`,
   ).join('');
 }
 
@@ -82,6 +115,9 @@ function setMode(nextMode) {
 }
 
 function finishSession() {
+  refreshToday();
+  const completedFocus = mode === 'focus';
+  const focusedMinutes = Math.round(activeDuration / 60);
   if (interval) window.clearInterval(interval);
   interval = null;
   endsAt = null;
@@ -91,9 +127,15 @@ function finishSession() {
   if (mode === 'focus') {
     state.completed += 1;
     state.sessionsToday += 1;
-    mode = state.sessionsToday % state.settings.cycle === 0 ? 'long' : 'short';
-    elements.note.textContent = experienceCopy().completedNote;
-    notificationTitle = '¡Sesión completa!';
+    const completion = completeChampionshipStep(state.championship, state.settings.cycle);
+    state.championship = completion.championship;
+    mode = completion.result.won ? 'long' : 'short';
+    if (state.experience.active === 'brota') {
+      state.celebration = { completed: state.completed, minutes: focusedMinutes, breakMode: mode, ...completion.result };
+    }
+    const championWon = state.experience.active === 'brota' && completion.result.won;
+    elements.note.textContent = championWon ? '¡Cinturón conquistado! Disfruta tu pausa larga.' : experienceCopy().completedNote;
+    notificationTitle = championWon ? '¡Cinturón conquistado!' : '¡Sesión completa!';
     notificationBody = `${experienceCopy().completedBody} Hora de una ${mode === 'long' ? 'pausa larga' : 'pausa corta'}.`;
     showToast(`${notificationTitle} ${notificationBody}`);
   } else {
@@ -110,6 +152,7 @@ function finishSession() {
   updateTimer();
   updateGarden();
   persist();
+  if (completedFocus && state.experience.active === 'brota') celebration.request(state.celebration);
 }
 
 function startTimer() {
@@ -117,6 +160,10 @@ function startTimer() {
   if (interval) {
     pauseTimer();
     return;
+  }
+  if (mode === 'focus') {
+    state.championship = beginChampionshipCycle(state.championship, state.settings.cycle);
+    updateGarden();
   }
   requestNotificationPermission(state.settings.notifications)?.then((permission) => {
     if (permission !== 'granted') {
@@ -265,10 +312,10 @@ async function sendNotification(title, body) {
     };
     if ('serviceWorker' in navigator) {
       const registration = await navigator.serviceWorker.ready;
-      await registration.showNotification(title, options);
+      await registration.showNotification(`${APP_NAME} · ${title}`, options);
       return;
     }
-    const notification = new Notification(title, options);
+    const notification = new Notification(`${APP_NAME} · ${title}`, options);
     notification.onclick = () => window.focus();
   } catch {
     showToast('El navegador no pudo mostrar la notificación.');
@@ -403,7 +450,9 @@ function saveSettings(event) {
   updateGarden();
   persist();
   elements.dialog.close();
-  showToast('Ajustes guardados en este dispositivo.');
+  showToast(state.settings.cycle !== state.championship.target
+    ? 'Ajustes guardados. El nuevo tamaño se aplicará al siguiente ciclo.'
+    : 'Ajustes guardados en este dispositivo.');
   if (notificationsRequested && typeof Notification === 'undefined') {
     showToast('Este navegador no admite notificaciones.');
   } else if (notificationsRequested && !permissionRequest && Notification.permission === 'denied') {
@@ -489,6 +538,7 @@ $('#alarm-options').addEventListener('click', (event) => {
 $('#alarm-options').addEventListener('change', stopAlarmPreview);
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
+    if (refreshToday()) { updateGarden(); persist(); }
     syncTimerFromClock();
     renderExperience(state.experience.active);
   }
@@ -496,7 +546,7 @@ document.addEventListener('visibilitychange', () => {
 window.addEventListener('focus', syncTimerFromClock);
 window.addEventListener('pageshow', syncTimerFromClock);
 window.addEventListener('keydown', (event) => {
-  if (event.code === 'Space' && !['INPUT', 'BUTTON'].includes(document.activeElement.tagName) && !elements.dialog.open && !isWriterRevealOpen()) {
+  if (event.code === 'Space' && !['INPUT', 'BUTTON', 'A'].includes(document.activeElement.tagName) && !elements.dialog.open && !isWriterRevealOpen() && !celebration.isOpen()) {
     event.preventDefault();
     startTimer();
   }
@@ -510,4 +560,6 @@ elements.note.textContent = mode === 'focus' ? experienceCopy().focusNote : expe
 updateTimer();
 updateGarden();
 recoverRunningTimer();
+if (state.celebration) celebration.request(state.celebration);
 if (state.experience.active === 'writer') revealWriterDesk();
+scheduleDayRefresh();

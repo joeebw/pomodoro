@@ -33,7 +33,6 @@
 [data-experience="writer"] :is(.brand,.mode,.primary-button,.save-button,.theme-select,.alarm-preview,.number-control input,.text-button,.timer-time,.daily-quote blockquote,.garden-heading h2,.dialog-header h2,.install-card h2) { font-family: var(--writer-font); }
 [data-experience="writer"] .brand { font-size: 19px; letter-spacing: -1px; }
 [data-experience="writer"] .topbar-right { gap: 15px; }
-[data-experience="writer"] :is(.scene-sky,.ground) { display: none; }
 .manuscript-stage { position: absolute; inset: 10px 0 32px; display: grid; place-items: center; }
 .manuscript-art { max-width: 90%; height: 100%; width: 260px; overflow: visible; }
 .manuscript-sheet { fill: var(--writer-sheet); stroke: var(--line); stroke-width: 1.2; }
@@ -52,7 +51,7 @@
 .manuscript-stage:is([data-stage="2"],[data-stage="3"],[data-stage="4"]) .more-lines,
 .manuscript-stage:is([data-stage="3"],[data-stage="4"]) .manuscript-stack,
 .manuscript-stage[data-stage="4"] .manuscript-complete { opacity: 1; }
-/* The literary desk has its own composition; Brota keeps its garden layout. */
+/* The literary desk has its own composition; INVICTO has its own arena layout. */
 .writer-intro, .writer-machine, .writer-reading { display: none; }
 #daily-quote-home { width: 100%; display: flex; justify-content: center; }
 [data-experience="writer"] body {

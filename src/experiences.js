@@ -1,9 +1,12 @@
-import { MODES, getPlantStage } from './timer.js';
+import { renderBrand } from './brand.js';
+import { MODES } from './timer.js';
 import { getDailyQuote } from './quotes.js';
 import { getDailyWriterQuote } from './writer-quotes.js';
 import { prepareWriterMachine, animateWriterMachine } from './writer-machine.js';
+import { renderChampionPath } from './champion-art.js';
 
 let dailyReadingTimeout;
+const getManuscriptStage = (completed) => completed === 0 ? 0 : ((completed - 1) % 4) + 1;
 
 export function normalizeExperience(saved) {
   const writerUnlocked = saved?.writerUnlocked === true;
@@ -18,15 +21,13 @@ export function unlockWriterExperience(code, current) {
 const EXPERIENCES = {
   brota: {
     modes: MODES,
-    focusNote: 'Un paso a la vez. Tu planta te acompaña.',
+    focusNote: 'Entrena tu enfoque. Construye tu próxima victoria.',
     pauseNote: 'Toma aire. Te lo has ganado.',
-    completedNote: '¡Sesión completa! Tu planta creció contigo.',
-    completedBody: 'Tu planta creció.',
+    completedNote: '¡Etapa completada! Estás más cerca del cinturón.',
+    completedBody: 'Una etapa más en tu camino al campeonato.',
     breakNote: 'Pausa terminada. Cuando quieras, seguimos.',
     breakBody: 'Toma aire; una nueva sesión de enfoque te espera.',
     readyNote: 'Temporizador listo cuando tú lo estés.',
-    stageLabels: ['Una semilla lista para crecer', 'Un brote tierno', 'Una planta joven', 'Una planta floreciendo', 'Una planta en su máximo esplendor'],
-    stageCaptions: ['Una semilla llena de posibilidades', '¡Un brote nuevo encontró su camino!', 'Tu constancia le da nuevas hojas', 'Mira qué bien está creciendo', 'Una planta feliz, gracias a ti'],
   },
   writer: {
     modes: {
@@ -52,33 +53,30 @@ export function renderExperience(active, { animate = false } = {}) {
   const writer = active === 'writer';
   const $ = (selector) => document.querySelector(selector);
   document.documentElement.dataset.experience = writer ? 'writer' : 'brota';
-  const dark = document.documentElement.dataset.theme === 'dark';
-  document.querySelector('meta[name="theme-color"]').content = writer
-    ? (dark ? '#211d19' : '#f5f0e6')
-    : (dark ? '#151e19' : '#f5f3ed');
-  $('#brand-name').textContent = writer ? 'brota / escritor' : 'brota';
-  $('.brand-mark').textContent = writer ? '✒' : '✳';
-  $('#progress-label').textContent = writer ? 'sesiones' : 'plantas';
-  $('#progress-icon').textContent = writer ? '✎' : '✿';
+  renderBrand(active);
+  $('#progress-label').textContent = writer ? 'sesiones' : 'cinturones';
+  $('#progress-icon').textContent = writer ? '✎' : '★';
   document.querySelector('.mode[data-mode="focus"]').textContent = writer ? 'Escritura' : 'Enfoque';
-  $('.garden-panel').setAttribute('aria-label', writer ? 'Tu manuscrito' : 'Tu jardín');
-  $('#garden-kicker').textContent = writer ? 'TU MANUSCRITO' : 'TU JARDÍN';
-  $('#garden-title').textContent = writer ? 'Algo tuyo está tomando forma.' : 'Algo bonito está creciendo.';
-  $('.garden-sun').textContent = writer ? '✎' : '☼';
-  $('#plant-stage').hidden = writer;
+  $('.garden-panel').setAttribute('aria-label', writer ? 'Tu manuscrito' : 'El camino del campeón');
+  $('#garden-kicker').textContent = writer ? 'TU MANUSCRITO' : 'TU PREPARACIÓN';
+  $('#garden-title').textContent = writer ? 'Algo tuyo está tomando forma.' : 'El campeonato empieza contigo.';
+  $('.garden-sun').textContent = writer ? '✎' : '★';
+  $('#champion-stage').hidden = writer;
+  $('#champion-total').hidden = writer;
   $('#manuscript-stage').hidden = !writer;
   $('#garden-tip-text').textContent = writer
     ? 'Cada sesión de enfoque suma un nuevo momento a tu manuscrito. Escribe a tu ritmo.'
-    : 'Cada minuto de enfoque ayuda a tu planta a crecer. Cuídala a tu ritmo.';
+    : 'Una sesión, una etapa. Completa tu preparación y conquista el cinturón. Descansar también es entrenar.';
   const quote = writer ? getDailyWriterQuote() : getDailyQuote();
   const figure = $('.daily-quote');
   (writer ? $('#writer-reading-home') : $('#daily-quote-home')).append(figure);
   figure.setAttribute('aria-label', writer ? 'Fragmento literario del día' : 'Frase del día');
   $('#daily-quote-text').textContent = quote.text;
   $('#daily-quote-author').textContent = `— ${quote.author}`;
-  $('#daily-quote-work').hidden = !writer;
+  $('#daily-quote-work').hidden = !quote.work;
   $('#daily-quote-work').textContent = quote.work || '';
-  $('#daily-quote-source').hidden = !writer;
+  $('#daily-quote-source').hidden = !quote.source;
+  $('#daily-quote-source').textContent = writer ? 'Leer la obra ↗' : 'Ver la fuente ↗';
   if (quote.source) $('#daily-quote-source').href = quote.source;
   const today = new Date();
   $('#reading-date').textContent = today.toLocaleDateString('es', { day: 'numeric', month: 'long' });
@@ -100,17 +98,18 @@ export function renderExperience(active, { animate = false } = {}) {
   }
 }
 
-export function renderExperienceProgress(active, completed) {
-  const stage = getPlantStage(completed);
+export function renderExperienceProgress(active, completed, championship, view) {
+  const stage = getManuscriptStage(completed);
   const copy = getExperienceCopy(active);
-  const plant = document.querySelector('#plant-stage');
   const manuscript = document.querySelector('#manuscript-stage');
-  plant.className = `plant-stage stage-${stage}`;
   manuscript.dataset.stage = String(stage);
   const previous = manuscript.dataset.completed === undefined ? completed : Number(manuscript.dataset.completed);
   manuscript.dataset.completed = String(completed);
   if (active === 'writer' && completed > previous) animateWriterMachine('complete');
-  const illustration = active === 'writer' ? manuscript : plant;
-  illustration.setAttribute('aria-label', copy.stageLabels[stage]);
-  document.querySelector('#plant-caption').textContent = copy.stageCaptions[stage];
+  if (active === 'writer') {
+    manuscript.setAttribute('aria-label', copy.stageLabels[stage]);
+    document.querySelector('#progress-caption').textContent = copy.stageCaptions[stage];
+  } else {
+    renderChampionPath(championship, completed, view);
+  }
 }

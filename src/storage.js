@@ -1,5 +1,6 @@
 import { DEFAULT_ALARM, isValidAlarm } from './alarms.js';
 import { normalizeExperience } from './experiences.js';
+import { normalizeChampionship } from './championship.js';
 
 const STORAGE_KEY = 'brota-pomodoro-v1';
 
@@ -9,7 +10,7 @@ export const DEFAULT_SETTINGS = {
   long: 15,
   cycle: 4,
   color: 'sage',
-  theme: 'light',
+  theme: 'dark',
   sound: true,
   alarm: DEFAULT_ALARM,
   notifications: true,
@@ -22,6 +23,7 @@ const DEFAULT_STATE = {
   date: new Date().toLocaleDateString('en-CA'),
   timer: null,
   experience: { writerUnlocked: false, active: 'brota' },
+  championship: normalizeChampionship(null, DEFAULT_SETTINGS.cycle),
 };
 
 function boundedInteger(value, min, max, fallback) {
@@ -39,7 +41,7 @@ function migrateSettings(savedSettings = {}) {
   const settings = {
     ...DEFAULT_SETTINGS,
     ...savedSettings,
-    theme: ['light', 'dark', 'system'].includes(savedSettings.theme) ? savedSettings.theme : DEFAULT_SETTINGS.theme,
+    theme: ['light', 'dark', 'system'].includes(savedSettings.theme) ? savedSettings.theme : 'light',
     alarm: isValidAlarm(savedSettings.alarm) ? savedSettings.alarm : DEFAULT_ALARM,
     cycle,
     focusDurations: Array.from({ length: 8 }, (_, index) =>
@@ -55,13 +57,23 @@ export function loadState() {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
     if (!saved || typeof saved !== 'object') return structuredClone(DEFAULT_STATE);
     const today = new Date().toLocaleDateString('en-CA');
+    const settings = migrateSettings(saved.settings);
+    const sessionsToday = saved.date === today ? Math.max(0, Number(saved.sessionsToday) || 0) : 0;
+    const championship = normalizeChampionship(saved.championship, settings.cycle, sessionsToday);
+    const celebration = saved.celebration ? {
+      ...saved.celebration,
+      target: saved.celebration.target ?? championship.target,
+      step: saved.celebration.step ?? (saved.celebration.breakMode === 'long' ? championship.target : Math.max(1, championship.steps)),
+    } : null;
     return {
       ...DEFAULT_STATE,
       ...saved,
-      settings: migrateSettings(saved.settings),
+      settings,
+      championship,
+      celebration,
       experience: normalizeExperience(saved.experience),
       completed: Math.max(0, Number(saved.completed) || 0),
-      sessionsToday: saved.date === today ? Math.max(0, Number(saved.sessionsToday) || 0) : 0,
+      sessionsToday,
       date: today,
     };
   } catch {
