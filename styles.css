@@ -167,3 +167,9 @@ body[data-color=rose] { --accent: #cb8c91; --accent-dark: #a96e75; }body[data-co
 .cycle-reset-preserved { color: var(--muted); font-size: 12px; line-height: 1.7; margin: 0 0 24px; }
 .cycle-reset-actions { display: flex; justify-content: flex-end; align-items: center; flex-wrap: wrap; gap: 12px; }
 [data-experience="writer"] .cycle-reset-button { font-family: var(--writer-font); }
+
+.advance-focus-button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; margin-top: 10px; padding: 7px 12px; border: 0; border-radius: 8px; background: transparent; color: var(--muted); font: 500 11px 'DM Sans',sans-serif; cursor: pointer; transition: color .2s, background .2s; }
+.advance-focus-button svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.advance-focus-button:hover { color: var(--accent-dark); background: var(--hover); }
+.advance-focus-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+[data-experience="writer"] .advance-focus-button { order: 5; font-family: var(--writer-font); }

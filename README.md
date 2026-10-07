@@ -32,6 +32,8 @@ En Ajustes → Apariencia puedes elegir Claro, Oscuro o Sistema. El cambio se mu
 
 ## El camino del campeón
 
+El botón **Adelantar enfoque**, debajo de los controles del reloj, permite finalizar manualmente la sesión y pasar al descanso correspondiente. Cuenta como una sesión completada y una etapa; si cierra el ciclo, concede el cinturón y ofrece la pausa larga. La celebración muestra los minutos transcurridos, redondeados hacia abajo, en lugar de la duración planificada. Está disponible con el enfoque activo o pausado, también en Escritor, y se oculta durante los descansos.
+
 El botón **Reiniciar ciclo**, debajo del progreso, pide confirmación antes de volver a la primera sesión. Al confirmar se detiene el reloj, se recupera la duración configurada para esa sesión y se borra únicamente el avance del ciclo actual. Los cinturones, las sesiones completadas y la configuración se conservan. Cancelar, cerrar con la X, pulsar Escape o tocar fuera del modal permite seguir con el ciclo; abrir la confirmación no pausa ni reinicia el reloj. Está disponible también en Escritor.
 
 INVICTO presenta una arena minimalista con un cinturón como objetivo. Cada sesión de enfoque ilumina una etapa del camino, con tantas etapas como sesiones tenga tu ciclo (2 a 8). Al completar el ciclo ganas un cinturón, aparece una celebración especial de unos cuatro segundos con luces, brillo y una cita deportiva, y comienza la opción de pausa larga. La cita permanece hasta que decidas continuar. La barra superior cuenta cinturones y la tarjeta conserva el total de sesiones de enfoque.

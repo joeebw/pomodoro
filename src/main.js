@@ -16,6 +16,7 @@ const $$ = (selector) => [...document.querySelectorAll(selector)];
 const elements = {
   timer: $('#timer'), ring: $('#ring-progress'), label: $('#session-label'), caption: $('#timer-caption'),
   start: $('#start-button'), reset: $('#reset-button'), note: $('#session-note-text'),
+  advanceFocus: $('#advance-focus-button'),
   progressCount: $('#progress-count'), cycleLabel: $('#cycle-label'),
   dialog: $('#settings-dialog'), form: $('#settings-form'), toast: $('#toast'), focusDurations: $('#focus-durations'),
   cycleResetDialog: $('#cycle-reset-dialog'),
@@ -82,6 +83,7 @@ function updateTimer() {
   elements.caption.textContent = experienceCopy().modes[mode].caption;
   const activity = state.experience.active === 'writer' ? 'sesión' : mode === 'focus' ? 'etapa' : 'descanso';
   const action = interval ? 'Pausar' : remaining < activeDuration ? 'Continuar' : 'Comenzar';
+  elements.advanceFocus.hidden = mode !== 'focus';
   elements.start.innerHTML = `<span class="${interval ? 'pause-icon' : 'play-icon'}" aria-hidden="true">${interval ? 'Ⅱ' : '▶'}</span><span>${action} ${activity}</span>`;
   $$('.mode').forEach((button) => {
     const active = button.dataset.mode === mode;
@@ -115,10 +117,12 @@ function setMode(nextMode) {
   persist();
 }
 
-function finishSession() {
+function finishSession({ early = false } = {}) {
   refreshToday();
   const completedFocus = mode === 'focus';
-  const focusedMinutes = Math.round(activeDuration / 60);
+  const focusedMinutes = early
+    ? Math.floor(Math.max(0, activeDuration - remaining) / 60)
+    : Math.round(activeDuration / 60);
   if (interval) window.clearInterval(interval);
   interval = null;
   endsAt = null;
@@ -154,6 +158,12 @@ function finishSession() {
   updateGarden();
   persist();
   if (completedFocus && state.experience.active === 'brota') celebration.request(state.celebration);
+}
+
+function advanceFocus() {
+  if (mode !== 'focus' || document.querySelector('dialog[open]')) return;
+  if (interval && endsAt) remaining = Math.max(0, (endsAt - Date.now()) / 1000);
+  finishSession({ early: true });
 }
 
 function startTimer() {
@@ -516,6 +526,7 @@ $('.mode-switch').addEventListener('click', (event) => {
 });
 elements.start.addEventListener('click', startTimer);
 elements.reset.addEventListener('click', resetTimer);
+elements.advanceFocus.addEventListener('click', advanceFocus);
 $('#cycle-reset-open').addEventListener('click', () => elements.cycleResetDialog.showModal());
 $('#cycle-reset-confirm').addEventListener('click', resetCycle);
 $('#cycle-reset-cancel').addEventListener('click', () => elements.cycleResetDialog.close());
