@@ -45,6 +45,9 @@ body { margin: 0; min-height: 100vh; background: radial-gradient(ellipse at 78% 
 .brand { text-decoration: none; color: var(--ink); font: 800 23px Manrope,sans-serif; letter-spacing: -1.3px; display: flex; align-items: center; gap: 9px; }
 .brand-mark { font-size: 23px; color: var(--accent); line-height: 1; }
 .topbar-right { display: flex; align-items: center; gap: 22px; }
+.header-stats { display: flex; align-items: center; gap: 18px; }
+.daily-sessions { display: flex; align-items: center; gap: 5px; padding-left: 18px; border-left: 1px solid var(--line); color: var(--muted); font-size: 13px; white-space: nowrap; }
+#daily-sessions-count { color: var(--accent-dark); font-weight: 700; font-variant-numeric: tabular-nums; }
 .streak { display: flex; align-items: center; gap: 7px; color: var(--accent-dark); font-size: 13px; font-weight: 700; }
 .streak>span:first-child { font-size: 17px; }.streak-label { font-weight: 500; color: var(--muted); }
 .icon-button,.reset-button,.close-button { display: grid; place-items: center; border: 0; background: transparent; color: var(--muted); cursor: pointer; }

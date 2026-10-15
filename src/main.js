@@ -18,6 +18,7 @@ const elements = {
   start: $('#start-button'), reset: $('#reset-button'), note: $('#session-note-text'),
   advanceFocus: $('#advance-focus-button'),
   progressCount: $('#progress-count'), cycleLabel: $('#cycle-label'),
+  dailySessionsCount: $('#daily-sessions-count'), dailySessionsLabel: $('#daily-sessions-label'),
   dialog: $('#settings-dialog'), form: $('#settings-form'), toast: $('#toast'), focusDurations: $('#focus-durations'),
   cycleResetDialog: $('#cycle-reset-dialog'),
 };
@@ -95,6 +96,8 @@ function updateTimer() {
 
 function updateGarden() {
   const view = championshipView(state.championship);
+  elements.dailySessionsCount.textContent = state.sessionsToday;
+  elements.dailySessionsLabel.textContent = state.sessionsToday === 1 ? 'sesión hoy' : 'sesiones hoy';
   renderExperienceProgress(state.experience.active, state.completed, state.championship, view);
   elements.progressCount.textContent = state.experience.active === 'writer' ? state.completed : state.championship.belts;
   $('.streak').setAttribute('aria-label', state.experience.active === 'writer'

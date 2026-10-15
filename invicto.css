@@ -131,6 +131,11 @@
   [data-experience="brota"] .garden-panel { width: min(100%, 430px); }
 }
 @media (max-width: 480px) {
+  [data-experience] .topbar { flex-wrap: wrap; height: auto; min-height: 108px; gap: 10px; padding: 14px 0; }
+  [data-experience] .topbar-right { width: 100%; gap: 10px; }
+  .header-stats { flex: 1; gap: 12px; }
+  .daily-sessions { padding-left: 12px; }
+  .topbar-right > .icon-button { flex-shrink: 0; }
   [data-experience="brota"] .topbar-right { gap: 10px; }
   [data-experience="brota"] .brand { font-size: 16px; letter-spacing: 1.4px; gap: 8px; }
   [data-experience="brota"] .brand-mark { width: 28px; height: 28px; }

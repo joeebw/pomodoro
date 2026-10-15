@@ -42,6 +42,8 @@ La preparación se guarda en el navegador y continúa entre días y recargas. La
 
 Las reglas del campeonato están en `src/championship.js` y el dibujo SVG local compartido en `src/champion-art.js`. La arena y las celebraciones funcionan sin conexión, respetan el tema elegido, los colores de acento y el movimiento reducido. Cerrar Ajustes sin guardar, pausar, reiniciar o cambiar de modalidad no concede cinturones.
 
+La barra superior muestra también las sesiones de hoy, tanto en INVICTO como en Escritor. El contador suma al completar o adelantar un enfoque, se conserva al recargar y al reiniciar el ciclo, y vuelve a cero al cambiar de día según la hora local del dispositivo. Los descansos no suman sesiones.
+
 ## Regalo para escritores
 
 En Ajustes → Tengo un código, introduce **COBAYA** para desbloquear el espacio Escritor. La app revela un escritorio literario mediante una entrada animada: fondo de tinta, tres hojas con frases y aparición de la máquina de escribir. El temporizador se integra en el papel de la máquina y el manuscrito crece al completar sesiones. La entrada se puede saltar con el botón o Escape y respeta la preferencia de movimiento reducido. Se muestra al desbloquear el regalo, al volver desde INVICTO a Escritor y en cada recarga con el modo Escritor activo. Las tres hojas muestran citas de autores reales que cambian cada día: 90 frases, tres distintas por fecha, con autor y enlace a la obra. Cada hoja dura 3,2 segundos y la presentación completa unos diez segundos; el temporizador continúa durante la presentación.
