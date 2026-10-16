@@ -8,7 +8,8 @@ import { applyTheme } from './theme.js';
 import { revealWriterDesk } from './writer-transition.js';
 import { animateWriterMachine, setWriterMachineRunning } from './writer-machine.js';
 import { createSessionCelebration } from './session-celebration.js';
-import { beginChampionshipCycle, championshipView, completeChampionshipStep, resetChampionshipCycle } from './championship.js';
+import { beginChampionshipCycle, championshipView, completeChampionshipStep, resetChampionshipCycle, undoChampionshipStep } from './championship.js';
+import { createDailySessionControls } from './daily-session-controls.js';
 import './pwa.js';
 
 const $ = (selector) => document.querySelector(selector);
@@ -38,6 +39,10 @@ let remaining = endsAt ? Math.max(0, endsAt - Date.now()) / 1000 : activeDuratio
 let interval = null;
 let toastTimeout = null;
 let previewButton = null;
+const dailySessionControls = createDailySessionControls({
+  onOpen: () => { refreshToday(); updateGarden(); persist(); },
+  onAdjust: adjustDailySessions,
+});
 const celebration = createSessionCelebration({
   getExperience: () => state.experience.active,
   onDismiss: () => {
@@ -98,6 +103,7 @@ function updateGarden() {
   const view = championshipView(state.championship);
   elements.dailySessionsCount.textContent = state.sessionsToday;
   elements.dailySessionsLabel.textContent = state.sessionsToday === 1 ? 'sesión hoy' : 'sesiones hoy';
+  dailySessionControls.render(state.sessionsToday);
   renderExperienceProgress(state.experience.active, state.completed, state.championship, view);
   elements.progressCount.textContent = state.experience.active === 'writer' ? state.completed : state.championship.belts;
   $('.streak').setAttribute('aria-label', state.experience.active === 'writer'
@@ -107,6 +113,19 @@ function updateGarden() {
   $('#cycle-dots').innerHTML = Array.from({ length: view.target }, (_, index) =>
     `<span class="${index < view.step ? 'done' : ''}"></span>`,
   ).join('');
+}
+
+function adjustDailySessions(delta) {
+  refreshToday();
+  if (delta > 0 || state.sessionsToday > 0) {
+    state.sessionsToday += delta;
+    state.completed = Math.max(0, state.completed + delta);
+    state.championship = delta > 0
+      ? completeChampionshipStep(state.championship, state.settings.cycle).championship
+      : undoChampionshipStep(state.championship);
+  }
+  updateGarden();
+  persist();
 }
 
 function setMode(nextMode) {

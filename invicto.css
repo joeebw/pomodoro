@@ -133,7 +133,7 @@
 @media (max-width: 480px) {
   [data-experience] .topbar { flex-wrap: wrap; height: auto; min-height: 108px; gap: 10px; padding: 14px 0; }
   [data-experience] .topbar-right { width: 100%; gap: 10px; }
-  .header-stats { flex: 1; gap: 12px; }
+  .header-stats { flex: 1; min-width: 0; flex-wrap: wrap; gap: 4px 12px; }
   .daily-sessions { padding-left: 12px; }
   .topbar-right > .icon-button { flex-shrink: 0; }
   [data-experience="brota"] .topbar-right { gap: 10px; }

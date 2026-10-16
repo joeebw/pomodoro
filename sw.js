@@ -1,5 +1,5 @@
 // Incrementa esta versión al cambiar los recursos precargados de la aplicación.
-const CACHE_NAME = 'brota-shell-v24';
+const CACHE_NAME = 'brota-shell-v28';
 const APP_FILES = [
   '/',
   '/index.html',
@@ -26,11 +26,13 @@ const APP_FILES = [
   '/src/writer-transition.js',
   '/src/writer-machine.js',
   '/src/main.js',
+  '/src/daily-session-controls.js',
   '/src/pwa.js',
   '/src/storage.js',
   '/src/timer.js',
   '/src/quotes.js',
   '/src/athlete-quotes.js',
+  '/src/classic-quotes.js',
   '/src/session-celebration.js',
   '/src/championship.js',
   '/src/champion-art.js',

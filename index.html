@@ -41,7 +41,19 @@
         <div class="topbar-right">
           <div class="header-stats">
             <div class="streak"><span id="progress-icon" aria-hidden="true">★</span><span id="progress-count">0</span><span class="streak-label" id="progress-label">cinturones</span></div>
-            <div class="daily-sessions" id="daily-sessions" role="status" aria-live="polite" aria-atomic="true"><span id="daily-sessions-count">0</span><span id="daily-sessions-label">sesiones hoy</span></div>
+            <button class="daily-sessions" id="daily-sessions" type="button" popovertarget="daily-sessions-panel" aria-controls="daily-sessions-panel" aria-expanded="false" title="Ajustar sesiones de hoy">
+              <span class="daily-sessions-status" role="status" aria-live="polite" aria-atomic="true"><span id="daily-sessions-count">0</span> <span id="daily-sessions-label">sesiones hoy</span></span><span aria-hidden="true">⌄</span>
+            </button>
+            <section class="daily-sessions-panel" id="daily-sessions-panel" popover="auto" aria-labelledby="daily-sessions-title">
+              <h2 id="daily-sessions-title">Ajustar sesiones de hoy</h2>
+              <p>Cada ajuste también cambia tus sesiones acumuladas y el progreso de tus cinturones.</p>
+              <div class="daily-sessions-controls">
+                <button id="daily-sessions-decrease" type="button" aria-label="Restar una sesión de hoy" disabled>−</button>
+                <span id="daily-sessions-value">0 sesiones hoy</span>
+                <button id="daily-sessions-increase" type="button" aria-label="Sumar una sesión de hoy">+</button>
+              </div>
+              <button class="text-button" type="button" popovertarget="daily-sessions-panel" popovertargetaction="hide">Listo</button>
+            </section>
           </div>
           <button class="icon-button install-button" id="install-app" type="button" aria-label="Instalar INVICTO" title="Instalar INVICTO" hidden>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4"/><path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></svg>

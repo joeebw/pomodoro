@@ -30,6 +30,15 @@ export function beginChampionshipCycle(championship, configuredCycle) {
   return { ...championship, target: cycleSize(configuredCycle), victorySize: 0 };
 }
 
+export function undoChampionshipStep(championship) {
+  if (championship.steps > 0) {
+    return { ...championship, steps: championship.steps - 1, victorySize: 0 };
+  }
+  if (championship.belts === 0) return championship;
+  const target = championship.victorySize || championship.target;
+  return { ...championship, target, steps: target - 1, belts: championship.belts - 1, victorySize: 0 };
+}
+
 export function resetChampionshipCycle(championship, configuredCycle) {
   return { ...championship, steps: 0, target: cycleSize(configuredCycle), victorySize: 0 };
 }
