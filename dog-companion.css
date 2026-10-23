@@ -3,7 +3,7 @@
 .dog-name { position: absolute; bottom: 0; left: 24px; color: var(--ink); background: var(--surface); border-radius: 3px; padding: 0 3px; font: 9px/11px ui-monospace, monospace; }
 .dog-bubble { position: absolute; top: 0; left: 15px; padding: 2px 5px; border-radius: 5px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); font: 700 10px/1.2 ui-monospace, monospace; white-space: nowrap; }
 .dog-bubble:empty { display: none; }
-.dog-asleep,.dog-tongue,.dog-dream { display: none; }
+.dog-asleep,.dog-tongue,.dog-dream,.dog-squat,.dog-lick-tongue { display: none; }
 .dog-tail { transform-origin: 9px 21px; }
 .dog-head { transform-origin: 33px 22px; }
 .dog-ear { transform-origin: 31px 10px; }
@@ -28,9 +28,11 @@
 .dog-companion[data-action="eat"] .dog-head { transform: translate(0,4px) rotate(12deg); }
 .dog-companion[data-action="eat"] .dog-jaw { animation: dog-chew .3s steps(2,end) infinite; }
 .dog-companion[data-action="eat"] .dog-ear { animation: dog-ear .6s ease-in-out infinite alternate; }
-.dog-companion[data-action="poop"] .dog-body { transform: translate(1px,3px) scaleY(.8); }
-.dog-companion[data-action="poop"] .dog-back-leg { transform: rotate(-35deg); }
-.dog-companion[data-action="poop"] .dog-tail { transform: rotate(30deg); }
+.dog-companion[data-action="poop"] .dog-awake > :is(.dog-body,.dog-tail) { display: none; }
+.dog-companion[data-action="poop"] .dog-squat { display: inline; animation: dog-squat 3.2s ease-in-out both; }
+.dog-companion[data-action="poop"] .dog-head { animation: dog-poop-head 3.2s ease-in-out both; }
+.dog-companion[data-action="poop"] .dog-ear { transform: rotate(8deg); }
+.dog-companion[data-action="lick"] .dog-lick-tongue { display: inline; transform-origin: 44px 22px; animation: dog-lick .6s steps(3,end) 2 both; }
 .dog-companion:is([data-action="bark"],[data-action="play"],[data-action="wag"],[data-action="yawn"]) .dog-tongue { display: inline; }
 .dog-companion[data-action="sleep"] .dog-awake { display: none; }
 .dog-companion[data-action="sleep"] .dog-asleep { display: inline; transform-origin: 25px 29px; animation: dog-breathe 3s ease-in-out infinite; }
@@ -62,6 +64,9 @@
 @keyframes dog-shake { to { margin-left: 2px; } }
 @keyframes dog-yawn { 40%,65% { transform: scaleY(2.5) translateY(1px); } }
 @keyframes dog-chew { 50% { transform: translateY(1.5px); } }
+@keyframes dog-squat { 0%,100% { transform: translateY(-2px); } 20%,75% { transform: translateY(0); } 45%,60% { transform: translateY(1px); } }
+@keyframes dog-poop-head { 0%,100% { transform: none; } 20%,75% { transform: translate(-2px,2px) rotate(4deg); } }
+@keyframes dog-lick { 0%,100% { opacity: 0; transform: translateY(1px) scaleY(.5); } 30%,65% { opacity: 1; transform: translateY(-3px) scaleY(1.3); } }
 @keyframes dog-breathe { 50% { transform: scaleY(.93); } }
 @keyframes dog-dream { 10% { opacity: .8; } 85%,100% { opacity: 0; transform: translate(5px,-14px) scale(1.3); } }
 @media (prefers-reduced-motion: reduce) {

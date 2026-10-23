@@ -1,5 +1,5 @@
 // Incrementa esta versión al cambiar los recursos precargados de la aplicación.
-const CACHE_NAME = 'brota-shell-v31';
+const CACHE_NAME = 'brota-shell-v32';
 const APP_FILES = [
   '/',
   '/index.html',
@@ -18,6 +18,9 @@ const APP_FILES = [
   '/assets/audio/bells.mp3',
   '/assets/audio/max-bark.mp3',
   '/assets/audio/max-eat.mp3',
+  '/assets/audio/max-poop.mp3',
+  '/assets/audio/max-scratch.wav',
+  '/assets/audio/max-lick.wav',
   '/assets/audio/flute.mp3',
   '/assets/audio/melody.mp3',
   '/src/alarms.js',

@@ -9,6 +9,7 @@ test('real audio buffers resume at the requested offset and cancelled loads cann
   let stops = 0;
   class AudioContext {
     state = 'running';
+    currentTime = 100;
     destination = {};
     resume() { return Promise.resolve(); }
     decodeAudioData(data) { return Promise.resolve({ duration: new Uint8Array(data)[0] === 1 ? 1.6 : 6.7 }); }
@@ -46,6 +47,13 @@ test('real audio buffers resume at the requested offset and cancelled loads cann
     await settle();
     assert.deepEqual(starts.at(-1), { duration: 1.6, when: 0, offset: 0 });
     audio.stop();
+    for (const kind of ['poop', 'scratch', 'lick']) {
+      audio.play(kind, 0, { delay: kind === 'poop' ? .55 : 0 });
+      await settle();
+      assert.equal(starts.at(-1).when, kind === 'poop' ? 100.55 : 0);
+      assert.equal(starts.at(-1).offset, 0);
+      audio.stop();
+    }
   } finally {
     globalThis.fetch = previousFetch;
     if (previousWindow === undefined) delete globalThis.window; else globalThis.window = previousWindow;

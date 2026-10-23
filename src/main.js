@@ -569,7 +569,7 @@ elements.cycleResetDialog.addEventListener('click', (event) => {
   if (event.target === elements.cycleResetDialog) elements.cycleResetDialog.close();
 });
 $('#settings-open').addEventListener('click', openSettings);
-for (const kind of ['bark', 'eat']) {
+for (const kind of ['bark', 'eat', 'poop', 'scratch', 'lick']) {
   $(`#max-preview-${kind}`).addEventListener('click', () => {
     stopAlarmPreview();
     maxPreview.unlock();

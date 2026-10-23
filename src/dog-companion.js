@@ -23,7 +23,7 @@ export function createDogCompanion() {
   const audio = createDogAudio();
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const care = createDogCare({ planMeal, onMealChange: () => syncEnvironment(true) });
-  const poses = ['sniff', 'sit', 'wag', 'stretch', 'play', 'scratch', 'shake', 'yawn'];
+  const poses = ['sniff', 'sit', 'wag', 'stretch', 'play', 'scratch', 'shake', 'yawn', 'lick'];
   let enabled = true, sound = true, sleeping = false;
   let environmentKey = '', lastPose = '';
   let point = { x: 8, y: 8 };
@@ -51,8 +51,12 @@ export function createDogCompanion() {
     dog.style.transform = `translate3d(${point.x}px, ${point.y}px, 0)`;
   }
   function pose(action) {
+    audio.stop();
     dog.dataset.action = action;
     bubble.textContent = action === 'bark' ? '¡Guau!' : '';
+    const effect = action === 'scratch' ? 'scratch' : action === 'poop' ? 'poop'
+      : ['lick', 'wag', 'play', 'yawn'].includes(action) ? 'lick' : null;
+    if (effect && sound && !sleeping && !blocked()) audio.play(effect, 0, { delay: effect === 'poop' ? .55 : 0 });
   }
   function stopActivity() {
     clearTimeout(timer); cancelAnimationFrame(frame);
@@ -62,7 +66,7 @@ export function createDogCompanion() {
   function rest() {
     const action = shuffled(poses.filter((entry) => entry !== lastPose))[0];
     lastPose = action; pose(action);
-    if (!reducedMotion.matches) timer = setTimeout(wander, randomDelay(1800, 4200));
+    if (!reducedMotion.matches) timer = setTimeout(wander, action === 'scratch' ? 2400 : randomDelay(1800, 4200));
   }
   function walk(route, arrived = rest, speed = 42) {
     stopActivity();
@@ -143,7 +147,7 @@ export function createDogCompanion() {
     if (performance.now() - lastBark < 10000 || care.meal || sleeping || blocked() || care.placing) return false;
     stopActivity(); lastBark = performance.now(); pose('bark');
     if (sound) audio.play('bark');
-    timer = setTimeout(rest, 1200);
+    timer = setTimeout(rest, 1800);
     return true;
   }
   function pulse() {
@@ -164,7 +168,10 @@ export function createDogCompanion() {
       const poopPoint = { x: point.x + 4, y: point.y + 32 };
       if (care.poopCount < 3 && care.canDrop(poopPoint) && rectFree(poopPoint, 44, 44)) {
         stopActivity(); pose('poop');
-        timer = setTimeout(() => { care.dropPoop(poopPoint); rest(); }, 1800);
+        timer = setTimeout(() => {
+          care.dropPoop(poopPoint);
+          timer = setTimeout(rest, 650);
+        }, 2550);
         return;
       }
     }
