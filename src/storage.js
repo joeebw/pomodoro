@@ -1,3 +1,4 @@
+import { normalizeDogProgress } from './dog-progress.js';
 import { DEFAULT_ALARM, isValidAlarm } from './alarms.js';
 import { normalizeExperience } from './experiences.js';
 import { normalizeChampionship } from './championship.js';
@@ -21,6 +22,7 @@ export const DEFAULT_SETTINGS = {
 const DEFAULT_STATE = {
   settings: DEFAULT_SETTINGS,
   completed: 0,
+  dog: normalizeDogProgress(null),
   sessionsToday: 0,
   date: new Date().toLocaleDateString('en-CA'),
   timer: null,
@@ -73,6 +75,7 @@ export function loadState() {
       ...DEFAULT_STATE,
       ...saved,
       settings,
+      dog: normalizeDogProgress(saved.dog),
       championship,
       celebration,
       experience: normalizeExperience(saved.experience),

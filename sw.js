@@ -1,5 +1,5 @@
 // Incrementa esta versión al cambiar los recursos precargados de la aplicación.
-const CACHE_NAME = 'brota-shell-v33';
+const CACHE_NAME = 'brota-shell-v34';
 const APP_FILES = [
   '/',
   '/index.html',
@@ -17,6 +17,7 @@ const APP_FILES = [
   '/icons/apple-touch-icon.png',
   '/assets/audio/bells.mp3',
   '/assets/audio/max-pant.wav',
+  '/assets/audio/max-bark.mp3',
   '/assets/audio/max-eat.mp3',
   '/assets/audio/max-poop.mp3',
   '/assets/audio/max-scratch.wav',
@@ -35,6 +36,7 @@ const APP_FILES = [
   '/src/dog-companion.js',
   '/src/dog-care.js',
   '/src/dog-art.js',
+  '/src/dog-progress.js',
   '/src/dog-audio.js',
   '/src/dog-movement.js',
   '/src/daily-session-controls.js',

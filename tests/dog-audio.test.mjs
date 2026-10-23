@@ -47,7 +47,7 @@ test('real audio buffers resume at the requested offset and cancelled loads cann
     await settle();
     assert.deepEqual(starts.at(-1), { duration: 1.6, when: 0, offset: 0 });
     audio.stop();
-    for (const kind of ['poop', 'scratch', 'lick']) {
+    for (const kind of ['bark', 'poop', 'scratch', 'lick']) {
       audio.play(kind, 0, { delay: kind === 'poop' ? .55 : 0 });
       await settle();
       assert.equal(starts.at(-1).when, kind === 'poop' ? 100.55 : 0);

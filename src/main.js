@@ -1,3 +1,4 @@
+import { rewardDogSession, consumeDogMeal, dogGrowth } from './dog-progress.js';
 import { APP_NAME, experienceName } from './brand.js';
 import { DEFAULT_SETTINGS, loadState, saveState } from './storage.js';
 import { durationFor, formatTime, MODES } from './timer.js';
@@ -42,7 +43,15 @@ let remaining = endsAt ? Math.max(0, endsAt - Date.now()) / 1000 : activeDuratio
 let interval = null;
 let toastTimeout = null;
 let previewButton = null;
-const dogCompanion = createDogCompanion();
+const dogCompanion = createDogCompanion({
+  onServe: () => {
+    if (!state.dog.meals) return false;
+    state.dog = consumeDogMeal(state.dog);
+    persist();
+    updateTimer();
+    return true;
+  },
+});
 const maxPreview = createDogAudio();
 const dailySessionControls = createDailySessionControls({
   onOpen: () => { refreshToday(); updateGarden(); persist(); },
@@ -87,7 +96,9 @@ function scheduleDayRefresh() {
 
 function updateTimer() {
   setWriterMachineRunning(Boolean(interval));
-  dogCompanion.update({ mode, running: Boolean(interval), enabled: state.settings.dogEnabled, sound: state.settings.dogSound });
+  const growth = dogGrowth(state.dog);
+  $('#max-growth').textContent = `${growth.stage} · ${growth.sessions} ${growth.sessions === 1 ? 'sesión' : 'sesiones'} juntos. ${growth.remaining ? `Será adulto a las 60 sesiones.` : '¡Max ya es adulto!'} Comidas disponibles: ${state.dog.meals}.`;
+  dogCompanion.update({ mode, running: Boolean(interval), enabled: state.settings.dogEnabled, sound: state.settings.dogSound, progress: state.dog });
   elements.timer.textContent = formatTime(remaining);
   elements.ring.style.strokeDasharray = ringLength;
   elements.ring.style.strokeDashoffset = ringLength * (1 - Math.max(0, remaining / activeDuration));
@@ -160,6 +171,7 @@ function finishSession({ early = false } = {}) {
   let notificationBody;
   if (mode === 'focus') {
     state.completed += 1;
+    state.dog = rewardDogSession(state.dog);
     state.sessionsToday += 1;
     const completion = completeChampionshipStep(state.championship, state.settings.cycle);
     state.championship = completion.championship;
@@ -570,7 +582,7 @@ elements.cycleResetDialog.addEventListener('click', (event) => {
   if (event.target === elements.cycleResetDialog) elements.cycleResetDialog.close();
 });
 $('#settings-open').addEventListener('click', openSettings);
-for (const kind of ['pant', 'eat', 'poop', 'scratch', 'lick']) {
+for (const kind of ['bark', 'pant', 'eat', 'poop', 'scratch', 'lick']) {
   $(`#max-preview-${kind}`).addEventListener('click', () => {
     stopAlarmPreview();
     maxPreview.unlock();

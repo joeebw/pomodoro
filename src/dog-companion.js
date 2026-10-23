@@ -1,8 +1,10 @@
+import { dogGrowth } from './dog-progress.js';
 import { DOG_ART } from './dog-art.js';
 import { createDogAudio } from './dog-audio.js';
 import { createDogCare } from './dog-care.js';
 import { DOG_SIZE, dogSpots, findDogRoute, isDogSpotFree } from './dog-movement.js';
 
+const POSE_DURATIONS = { scratch: 3200, lick: 1500, roll: 3200, look: 3000, paw: 2400, ball: 3000, bow: 2400 };
 const randomDelay = (min, max) => min + Math.random() * (max - min);
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 function shuffled(items) {
@@ -14,7 +16,7 @@ function shuffled(items) {
   return result;
 }
 
-export function createDogCompanion() {
+export function createDogCompanion({ onServe }) {
   const dog = document.createElement('div');
   dog.className = 'dog-companion'; dog.hidden = true;
   dog.setAttribute('aria-hidden', 'true'); dog.innerHTML = DOG_ART;
@@ -22,16 +24,18 @@ export function createDogCompanion() {
   const bubble = dog.querySelector('.dog-bubble');
   const audio = createDogAudio();
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-  const care = createDogCare({ planMeal, onMealChange: () => syncEnvironment(true) });
-  const poses = ['sniff', 'sit', 'wag', 'stretch', 'play', 'scratch', 'shake', 'yawn', 'lick'];
+  const care = createDogCare({ planMeal, onServe, onMealChange: () => syncEnvironment(true) });
+  const poses = ['sniff', 'sit', 'wag', 'stretch', 'play', 'scratch', 'shake', 'yawn', 'lick', 'bow', 'look', 'paw', 'roll', 'ball'];
   let enabled = true, sound = true, sleeping = false;
   let environmentKey = '', lastPose = '';
+  let goingToPoop = false;
   let point = { x: 8, y: 8 };
   let positioned = false;
   let timer, frame, heartbeat;
   let lastPulse = 0, awakeTime = 0;
-  let nextPant = randomDelay(45000, 90000), nextPoop = randomDelay(180000, 360000);
-  let lastPant = -Infinity, lastReaction = -Infinity;
+  let nextVocal = randomDelay(45000, 90000), nextPoop = randomDelay(60000, 120000);
+  let vocalIndex = 0;
+  let lastVocal = -Infinity, lastReaction = -Infinity;
   let approachArmed = true, reactionIndex = 0;
   let obstacles = [], viewport;
   const recent = [];
@@ -53,20 +57,20 @@ export function createDogCompanion() {
   function pose(action) {
     audio.stop();
     dog.dataset.action = action;
-    bubble.textContent = '';
+    bubble.textContent = action === 'bark' ? '¡Guau!' : '';
     const effect = action === 'scratch' ? 'scratch' : action === 'poop' ? 'poop'
-      : ['lick', 'wag', 'play', 'yawn'].includes(action) ? 'lick' : null;
+      : action === 'lick' ? 'lick' : null;
     if (effect && sound && !sleeping && !blocked()) audio.play(effect, 0, { delay: effect === 'poop' ? .55 : 0 });
   }
   function stopActivity() {
     clearTimeout(timer); cancelAnimationFrame(frame);
-    timer = null; frame = null;
+    timer = null; frame = null; goingToPoop = false;
   }
   function blocked() { return !enabled || document.hidden || Boolean(document.querySelector('dialog[open]')); }
   function rest() {
     const action = shuffled(poses.filter((entry) => entry !== lastPose))[0];
     lastPose = action; pose(action);
-    if (!reducedMotion.matches) timer = setTimeout(wander, action === 'scratch' ? 2400 : randomDelay(1800, 4200));
+    if (!reducedMotion.matches) timer = setTimeout(wander, POSE_DURATIONS[action] ?? randomDelay(1800, 4200));
   }
   function walk(route, arrived = rest, speed = 42) {
     stopActivity();
@@ -143,12 +147,39 @@ export function createDogCompanion() {
     stopActivity();
     timer = setTimeout(() => { care.clearMeal(false); rest(); }, 1300);
   }
-  function pant() {
-    if (performance.now() - lastPant < 10000 || care.meal || sleeping || blocked() || care.placing) return false;
-    stopActivity(); lastPant = performance.now(); pose('pant');
-    if (sound) audio.play('pant');
-    timer = setTimeout(rest, 3800);
+  function vocalize() {
+    const kind = vocalIndex % 2 ? 'pant' : 'bark';
+    if (performance.now() - lastVocal < 10000 || care.meal || sleeping || blocked() || care.placing || goingToPoop) return false;
+    vocalIndex++;
+    stopActivity(); lastVocal = performance.now(); pose(kind);
+    if (sound) audio.play(kind);
+    timer = setTimeout(rest, kind === 'bark' ? 2000 : 4200);
     return true;
+  }
+  function tryPoop() {
+    if (care.poopCount >= 3) return false;
+    measure();
+    const candidates = [point, ...dogSpots(viewport).sort((a, b) => distance(a, point) - distance(b, point))];
+    for (const spot of candidates) {
+      const poopPoint = { x: spot.x + 4, y: spot.y + 32 };
+      if (!care.canDrop(poopPoint) || !rectFree(poopPoint, 44, 44)) continue;
+      const route = findDogRoute(point, spot, viewport, obstacles);
+      if (!route) continue;
+      // Reserve time to walk there without the heartbeat restarting the route.
+      nextPoop = awakeTime + 60000;
+      walk(route, () => {
+        goingToPoop = false;
+        pose('poop');
+        timer = setTimeout(() => {
+          care.dropPoop(poopPoint);
+          nextPoop = awakeTime + randomDelay(180000, 360000);
+          timer = setTimeout(rest, 650);
+        }, 2550);
+      }, 60);
+      goingToPoop = !reducedMotion.matches;
+      return true;
+    }
+    return false;
   }
   function pulse() {
     const now = performance.now();
@@ -162,22 +193,15 @@ export function createDogCompanion() {
       return;
     }
     if (meal || care.placing) return;
-    if (awakeTime >= nextPoop) {
-      nextPoop = awakeTime + randomDelay(180000, 360000);
-      measure();
-      const poopPoint = { x: point.x + 4, y: point.y + 32 };
-      if (care.poopCount < 3 && care.canDrop(poopPoint) && rectFree(poopPoint, 44, 44)) {
-        stopActivity(); pose('poop');
-        timer = setTimeout(() => {
-          care.dropPoop(poopPoint);
-          timer = setTimeout(rest, 650);
-        }, 2550);
-        return;
-      }
+    if (awakeTime >= nextPoop && !goingToPoop && dog.dataset.action !== 'poop') {
+      // Retry shortly if interrupted or no space is reachable; don't postpone
+      // the entire interval when Max happens to be beside a control.
+      nextPoop = awakeTime + 5000;
+      if (tryPoop()) return;
     }
-    if (awakeTime >= nextPant && dog.dataset.action !== 'poop') {
-      nextPant = awakeTime + randomDelay(45000, 90000);
-      pant();
+    if (awakeTime >= nextVocal && dog.dataset.action !== 'poop') {
+      nextVocal = awakeTime + randomDelay(45000, 90000);
+      vocalize();
     }
   }
   function syncEnvironment(force = false) {
@@ -207,7 +231,7 @@ export function createDogCompanion() {
     if (care.meal) goEat(); else rest();
   }
   function react(event) {
-    if (blocked() || sleeping || dog.hidden || care.meal || care.placing) return;
+    if (blocked() || sleeping || dog.hidden || care.meal || care.placing || goingToPoop) return;
     if (event.target.closest('button, a, input, select, textarea, [role="button"]')) return;
     const center = { x: point.x + DOG_SIZE.width / 2, y: point.y + DOG_SIZE.height / 2 };
     const proximity = distance({ x: event.clientX, y: event.clientY }, center);
@@ -225,7 +249,7 @@ export function createDogCompanion() {
         if (route) { walk(route, rest, 100); return; }
       }
     }
-    if (reaction === 2 && pant()) return;
+    if (reaction === 2 && vocalize()) return;
     stopActivity(); pose(reaction === 1 ? 'play' : 'wag'); timer = setTimeout(rest, 1200);
   }
   document.addEventListener('pointermove', react, { passive: true });
@@ -238,9 +262,13 @@ export function createDogCompanion() {
   window.addEventListener('scroll', () => syncEnvironment(true), { passive: true });
   reducedMotion.addEventListener('change', () => syncEnvironment(true));
   return {
-    update({ mode, running, enabled: showDog, sound: dogSound }) {
+    update({ mode, running, enabled: showDog, sound: dogSound, progress }) {
       const wasSleeping = sleeping;
       enabled = showDog; sound = dogSound; sleeping = mode === 'focus' && running;
+      const growth = dogGrowth(progress);
+      dog.style.setProperty('--dog-scale', growth.scale);
+      dog.dataset.stage = growth.stage;
+      care.setFeeding({ available: progress.meals, asleep: sleeping });
       care.setEnabled(enabled);
       if (sleeping && !wasSleeping) care.clearPoop();
       if (!sound) audio.stop();

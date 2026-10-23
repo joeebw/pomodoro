@@ -26,12 +26,14 @@ export const DOG_ART = `
           <path fill="#8d512f" d="M13 24h3v2h-3z"/>
         </g>
       </g>
+      <g class="dog-wave-paw"><path fill="#ad6b3b" d="M30 22h4v-7h4v3h-2v8h-6z"/><path fill="#f7ead2" d="M34 12h5v5h-5z"/></g>
+      <g class="dog-toy"><path fill="#ed8b44" d="M38 27h6v4h-6z"/><path fill="#ffe285" d="M38 27h3v2h-3z"/></g>
       <g class="dog-head">
         <path fill="#b97541" d="M32 7h9v2h3v11h-2v4H31v-3h-3V11h4z"/>
         <path fill="#f7ead2" d="M37 7h3v9h-3zM36 16h10v8H34v-3h-2v-3h4z"/>
         <path fill="#e0b07a" d="M34 10h3v4h-3z"/>
         <g class="dog-ear"><path fill="#754329" d="M29 9h6v17h-2v2h-4v-3h-2V12h2z"/><path fill="#965631" d="M29 12h3v13h-3z"/></g>
-        <path fill="#30281f" d="M43 15h5v4h-5zM39 11h2v3h-2z"/>
+        <path fill="#30281f" d="M43 15h5v4h-5z"/><path class="dog-eye" fill="#30281f" d="M39 11h2v3h-2z"/>
         <path fill="#8d512f" d="M38 14h4v1h-4z"/>
         <g class="dog-jaw"><path fill="#e1caaa" d="M36 23h9v2h-9z"/><path class="dog-tongue" fill="#e89594" d="M39 24h3v3h-3z"/></g>
         <path class="dog-lick-tongue" fill="#e89594" d="M42 20h3v4h-2v-1h-1z"/>

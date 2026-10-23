@@ -1,6 +1,6 @@
 import { BOWL_ART, POOP_ART } from './dog-art.js';
 
-export function createDogCare({ planMeal, onMealChange }) {
+export function createDogCare({ planMeal, onMealChange, onServe }) {
   const feed = document.querySelector('#max-feed');
   const layer = document.createElement('div');
   layer.className = 'max-care';
@@ -11,6 +11,7 @@ export function createDogCare({ planMeal, onMealChange }) {
   const preview = layer.querySelector('.max-bowl-preview');
   let placing = false;
   let enabled = true;
+  let meals = 0, sleeping = false;
   let meal = null;
   let cursor = { x: innerWidth / 2, y: innerHeight / 2 };
   const poops = new Set();
@@ -22,9 +23,10 @@ export function createDogCare({ planMeal, onMealChange }) {
     preview.style.transform = `translate(${p.x}px, ${p.y}px)`;
   }
   function renderButton() {
-    feed.disabled = placing || Boolean(meal);
+    feed.disabled = placing || Boolean(meal) || meals === 0 || sleeping;
     feed.hidden = !enabled;
-    const label = meal ? 'Comida servida para Max' : 'Darle de comer a Max';
+    const label = meal ? 'Comida servida para Max' : sleeping ? 'Max duerme: dale de comer al terminar el enfoque'
+      : meals === 0 ? 'Completa una sesión de enfoque para darle de comer a Max' : `Darle de comer a Max (${meals} ${meals === 1 ? 'comida disponible' : 'comidas disponibles'})`;
     feed.setAttribute('aria-label', label);
     feed.title = label;
     const text = feed.querySelector('.max-feed-label');
@@ -51,6 +53,7 @@ export function createDogCare({ planMeal, onMealChange }) {
       message.textContent = 'Max no puede comer ahí. Elige otro espacio libre y accesible.';
       return;
     }
+    if (sleeping || !meals || !onServe()) { cancel(true); return; }
     const element = document.createElement('button');
     element.className = 'max-bowl';
     element.type = 'button';
@@ -65,7 +68,7 @@ export function createDogCare({ planMeal, onMealChange }) {
     onMealChange();
   }
   feed.addEventListener('click', () => {
-    if (!enabled || meal) return;
+    if (!enabled || meal || !meals || sleeping) return;
     placing = true;
     toolbar.hidden = false; preview.hidden = false;
     message.textContent = 'Elige un espacio libre para el plato. También puedes usar las flechas y Enter.';
@@ -107,6 +110,11 @@ export function createDogCare({ planMeal, onMealChange }) {
       // leave an interactive bowl or poop sitting over an application control.
       if (meal) meal.element.hidden = !canShow(meal.point);
       for (const element of poops) element.hidden = !canShow(poopLocations.get(element));
+    },
+    setFeeding({ available, asleep }) {
+      meals = available; sleeping = asleep;
+      if (sleeping || meals === 0) cancel(false, false);
+      renderButton();
     },
     setEnabled(value) {
       enabled = value;
