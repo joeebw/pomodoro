@@ -34,7 +34,19 @@ En Ajustes → Apariencia puedes elegir Claro, Oscuro o Sistema. El cambio se mu
 
 ## El camino del campeón
 
-El botón **Adelantar enfoque**, debajo de los controles del reloj, permite finalizar manualmente la sesión y pasar al descanso correspondiente. Cuenta como una sesión completada y una etapa; si cierra el ciclo, concede el cinturón y ofrece la pausa larga. La celebración muestra los minutos transcurridos, redondeados hacia abajo, en lugar de la duración planificada. Está disponible con el enfoque activo o pausado, también en Escritor, y se oculta durante los descansos.
+El botón **Adelantar enfoque**, debajo de los controles del reloj, permite finalizar manualmente la sesión y pasar al descanso correspondiente. Cuenta como una sesión completada y una etapa; si cierra el ciclo, concede el cinturón y ofrece la pausa larga. La celebración muestra los minutos transcurridos, redondeados hacia abajo, en lugar de la duración planificada. Está disponible con el enfoque activo o pausado, también en Escritor.
+
+En las pausas corta y larga ese mismo botón cambia a **Adelantar descanso**. Termina la pausa y prepara el siguiente enfoque con su duración completa y el reloj detenido, incluso si aún no iniciaste el descanso o lo pausaste. No suma sesiones ni cinturones y no reproduce alarmas ni envía notificaciones.
+
+**Max** es un basset hound tricolor de pixel art, con cuerpo alargado, patas cortas y orejas caídas. Camina y trota por rutas que rodean los controles; favorece el interior de la pantalla y evita repetir sus últimos destinos. Olfatea, juega, se sienta, bosteza, se rasca, se sacude y mueve la cola. Al acercarte con el mouse puede apartarse, saltar o ladrar; debes alejar el puntero para provocar otra aproximación. También ladra por su cuenta cada 45–90 segundos de actividad despierto, con un límite compartido de diez segundos entre ladridos.
+
+Al comenzar el enfoque, Max se detiene y **duerme exactamente donde está**, con respiración suave y letras de sueño flotantes. Despierta al pausar o entrar en descanso. Se oculta con los diálogos y detiene actividad y audio con la pestaña oculta. Con movimiento reducido usa poses estáticas.
+
+Pulsa **Darle de comer** y elige un espacio libre con clic o toque; también puedes usar las flechas y Enter o cancelar con Escape. Solo habrá un plato. Max camina hasta él, come durante unos siete segundos con una grabación real de un perro masticando y después retoma su actividad. Puedes retirar el plato tocándolo. Si está dormido, la comida espera a que despierte. Si comienza el enfoque mientras come, duerme ahí mismo y conserva la porción pendiente.
+
+Cada 3–6 minutos de actividad despierto puede hacer popó, con un máximo de tres piezas. Límpialas con clic, toque o teclado. Se retiran al comenzar el enfoque; al ocultar a Max o recargar se retiran también la comida y todas las piezas. Estos objetos no se guardan entre visitas.
+
+En Ajustes, **Mostrar a Max** y **Sonidos de Max** conservan las preferencias anteriores y permiten ocultarlo o silenciarlo. Los sonidos son grabaciones locales reales e independientes de la alarma; puedes probarlas con **Escuchar ladrido** y **Escuchar cómo come**. Sus fuentes y licencias están en `assets/audio/ATTRIBUTION.md`. Max, la comida y sus sonidos funcionan sin conexión.
 
 El botón **Reiniciar ciclo**, debajo del progreso, pide confirmación antes de volver a la primera sesión. Al confirmar se detiene el reloj, se recupera la duración configurada para esa sesión y se borra únicamente el avance del ciclo actual. Los cinturones, las sesiones completadas y la configuración se conservan. Cancelar, cerrar con la X, pulsar Escape o tocar fuera del modal permite seguir con el ciclo; abrir la confirmación no pausa ni reinicia el reloj. Está disponible también en Escritor.
 

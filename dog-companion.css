@@ -1,0 +1,74 @@
+.dog-companion { position: fixed; left: 0; top: 0; width: 72px; height: 76px; z-index: 20; pointer-events: none; user-select: none; contain: layout style; will-change: transform; }
+.dog-sprite { position: absolute; bottom: 12px; left: 0; width: 72px; height: 48px; overflow: visible; image-rendering: pixelated; transform: scaleX(var(--dog-direction, 1)); filter: drop-shadow(0 1px 1px #0003); }
+.dog-name { position: absolute; bottom: 0; left: 24px; color: var(--ink); background: var(--surface); border-radius: 3px; padding: 0 3px; font: 9px/11px ui-monospace, monospace; }
+.dog-bubble { position: absolute; top: 0; left: 15px; padding: 2px 5px; border-radius: 5px; background: var(--surface); color: var(--ink); border: 1px solid var(--line); font: 700 10px/1.2 ui-monospace, monospace; white-space: nowrap; }
+.dog-bubble:empty { display: none; }
+.dog-asleep,.dog-tongue,.dog-dream { display: none; }
+.dog-tail { transform-origin: 9px 21px; }
+.dog-head { transform-origin: 33px 22px; }
+.dog-ear { transform-origin: 31px 10px; }
+.dog-jaw { transform-origin: 38px 23px; }
+.dog-body { transform-origin: 28px 27px; }
+.dog-front-leg,.dog-back-leg { transform-box: fill-box; transform-origin: center top; }
+.dog-companion:is([data-action="walk"],[data-action="trot"]) .dog-front-leg { animation: dog-step .38s steps(3,end) infinite alternate; }
+.dog-companion:is([data-action="walk"],[data-action="trot"]) .dog-back-leg { animation: dog-step .38s steps(3,end) infinite alternate-reverse; }
+.dog-companion:is([data-action="walk"],[data-action="trot"],[data-action="shake"]) .dog-ear { animation: dog-ear .38s steps(3,end) infinite alternate; }
+.dog-companion[data-action="trot"] :is(.dog-front-leg,.dog-back-leg,.dog-ear) { animation-duration: .2s; }
+.dog-companion:is([data-action="wag"],[data-action="play"],[data-action="walk"],[data-action="trot"]) .dog-tail { animation: dog-wag .24s steps(2,end) infinite alternate; }
+.dog-companion[data-action="sniff"] .dog-head { animation: dog-sniff .7s steps(3,end) infinite alternate; }
+.dog-companion[data-action="sit"] .dog-body { transform: translate(3px,2px) scaleX(.75); }
+.dog-companion[data-action="stretch"] .dog-body { transform: scaleX(1.1) scaleY(.7); }
+.dog-companion[data-action="stretch"] .dog-head { transform: translate(1px,4px); }
+.dog-companion[data-action="play"] .dog-sprite { animation: dog-hop .6s steps(4,end) infinite; }
+.dog-companion[data-action="bark"] .dog-head { animation: dog-bark .3s steps(2,end) 4; }
+.dog-companion[data-action="scratch"] .dog-back-leg { animation: dog-scratch .18s steps(2,end) infinite alternate; }
+.dog-companion[data-action="scratch"] .dog-body { transform: translate(2px,2px) scaleX(.8); }
+.dog-companion[data-action="shake"] .dog-sprite { animation: dog-shake .15s steps(2,end) infinite alternate; }
+.dog-companion[data-action="yawn"] .dog-jaw { animation: dog-yawn 2.5s ease-in-out; }
+.dog-companion[data-action="eat"] .dog-head { transform: translate(0,4px) rotate(12deg); }
+.dog-companion[data-action="eat"] .dog-jaw { animation: dog-chew .3s steps(2,end) infinite; }
+.dog-companion[data-action="eat"] .dog-ear { animation: dog-ear .6s ease-in-out infinite alternate; }
+.dog-companion[data-action="poop"] .dog-body { transform: translate(1px,3px) scaleY(.8); }
+.dog-companion[data-action="poop"] .dog-back-leg { transform: rotate(-35deg); }
+.dog-companion[data-action="poop"] .dog-tail { transform: rotate(30deg); }
+.dog-companion:is([data-action="bark"],[data-action="play"],[data-action="wag"],[data-action="yawn"]) .dog-tongue { display: inline; }
+.dog-companion[data-action="sleep"] .dog-awake { display: none; }
+.dog-companion[data-action="sleep"] .dog-asleep { display: inline; transform-origin: 25px 29px; animation: dog-breathe 3s ease-in-out infinite; }
+.dog-companion[data-action="sleep"] .dog-dream { display: block; }
+.dog-dream { position: absolute; right: 6px; top: 0; width: 32px; height: 28px; color: var(--accent); }
+.dog-dream i { position: absolute; bottom: 0; left: 0; font: 700 12px ui-monospace,monospace; opacity: 0; animation: dog-dream 3s ease-out infinite; text-shadow: 0 0 3px var(--surface); }
+.dog-dream i:nth-child(2) { left: 9px; font-size: 14px; animation-delay: 1s; }
+.dog-dream i:nth-child(3) { left: 18px; font-size: 17px; animation-delay: 2s; }
+.max-feed-button { display: flex; margin: 2px auto 0; min-height: 44px; }
+[data-experience="writer"] .max-feed-button { order: 6; }
+.max-sound-previews { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
+.max-care { position: fixed; inset: 0; z-index: 21; pointer-events: none; }
+.max-bowl,.max-poop { position: absolute; left: 0; top: 0; width: 44px; height: 44px; border: 0; padding: 0; background: transparent; pointer-events: auto; cursor: pointer; }
+.max-bowl svg { width: 44px; height: 36px; }
+.max-poop svg { width: 28px; height: 28px; }
+.max-bowl-preview { pointer-events: none; opacity: .65; }
+.max-kibble { opacity: var(--food-left,1); transform-origin: 22px 18px; transform: scaleY(var(--food-left,1)); }
+.max-bowl-empty .max-kibble { display: none; }
+.max-bowl:focus-visible,.max-poop:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
+.max-cleaned { opacity: 0; transition: opacity .2s; pointer-events: none; }
+.max-placement { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); width: min(460px,calc(100% - 24px)); display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); box-shadow: var(--shadow); pointer-events: auto; font: 12px/1.5 'DM Sans',sans-serif; }
+.max-placement button { min-height: 44px; padding: 8px; border: 0; border-radius: 8px; background: var(--hover); color: var(--ink); cursor: pointer; }
+@keyframes dog-step { to { transform: translateX(3px) rotate(15deg); } }
+@keyframes dog-wag { to { transform: rotate(-30deg); } }
+@keyframes dog-ear { to { transform: rotate(12deg); } }
+@keyframes dog-sniff { to { transform: translate(1px,4px) rotate(12deg); } }
+@keyframes dog-hop { 50% { bottom: 22px; } }
+@keyframes dog-bark { to { transform: translate(1px,-2px); } }
+@keyframes dog-scratch { to { transform: translate(5px,-6px) rotate(-40deg); } }
+@keyframes dog-shake { to { margin-left: 2px; } }
+@keyframes dog-yawn { 40%,65% { transform: scaleY(2.5) translateY(1px); } }
+@keyframes dog-chew { 50% { transform: translateY(1.5px); } }
+@keyframes dog-breathe { 50% { transform: scaleY(.93); } }
+@keyframes dog-dream { 10% { opacity: .8; } 85%,100% { opacity: 0; transform: translate(5px,-14px) scale(1.3); } }
+@media (prefers-reduced-motion: reduce) {
+  .dog-companion *, .dog-companion::before { animation: none !important; }
+  .dog-companion { will-change: auto; }
+  .dog-dream i { opacity: .8; transform: none; }
+  .dog-dream i:nth-child(2) { bottom: 5px; }.dog-dream i:nth-child(3) { bottom: 10px; }
+  .max-cleaned { transition: none; }
+}

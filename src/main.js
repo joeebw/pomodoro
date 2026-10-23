@@ -10,6 +10,8 @@ import { animateWriterMachine, setWriterMachineRunning } from './writer-machine.
 import { createSessionCelebration } from './session-celebration.js';
 import { beginChampionshipCycle, championshipView, completeChampionshipStep, resetChampionshipCycle, undoChampionshipStep } from './championship.js';
 import { createDailySessionControls } from './daily-session-controls.js';
+import { createDogCompanion } from './dog-companion.js';
+import { createDogAudio } from './dog-audio.js';
 import './pwa.js';
 
 const $ = (selector) => document.querySelector(selector);
@@ -39,6 +41,8 @@ let remaining = endsAt ? Math.max(0, endsAt - Date.now()) / 1000 : activeDuratio
 let interval = null;
 let toastTimeout = null;
 let previewButton = null;
+const dogCompanion = createDogCompanion();
+const maxPreview = createDogAudio();
 const dailySessionControls = createDailySessionControls({
   onOpen: () => { refreshToday(); updateGarden(); persist(); },
   onAdjust: adjustDailySessions,
@@ -82,6 +86,7 @@ function scheduleDayRefresh() {
 
 function updateTimer() {
   setWriterMachineRunning(Boolean(interval));
+  dogCompanion.update({ mode, running: Boolean(interval), enabled: state.settings.dogEnabled, sound: state.settings.dogSound });
   elements.timer.textContent = formatTime(remaining);
   elements.ring.style.strokeDasharray = ringLength;
   elements.ring.style.strokeDashoffset = ringLength * (1 - Math.max(0, remaining / activeDuration));
@@ -89,7 +94,8 @@ function updateTimer() {
   elements.caption.textContent = experienceCopy().modes[mode].caption;
   const activity = state.experience.active === 'writer' ? 'sesión' : mode === 'focus' ? 'etapa' : 'descanso';
   const action = interval ? 'Pausar' : remaining < activeDuration ? 'Continuar' : 'Comenzar';
-  elements.advanceFocus.hidden = mode !== 'focus';
+  elements.advanceFocus.querySelector('span').textContent = mode === 'focus' ? 'Adelantar enfoque' : 'Adelantar descanso';
+  elements.advanceFocus.title = mode === 'focus' ? 'Terminar este enfoque y pasar al descanso' : 'Terminar este descanso y preparar el siguiente enfoque';
   elements.start.innerHTML = `<span class="${interval ? 'pause-icon' : 'play-icon'}" aria-hidden="true">${interval ? 'Ⅱ' : '▶'}</span><span>${action} ${activity}</span>`;
   $$('.mode').forEach((button) => {
     const active = button.dataset.mode === mode;
@@ -172,8 +178,10 @@ function finishSession({ early = false } = {}) {
     notificationBody = experienceCopy().breakBody;
     showToast(`${notificationTitle}. ${notificationBody}`);
   }
-  if (state.settings.sound) playChime();
-  if (state.settings.notifications) sendNotification(notificationTitle, notificationBody);
+  if (!(early && !completedFocus)) {
+    if (state.settings.sound) playChime();
+    if (state.settings.notifications) sendNotification(notificationTitle, notificationBody);
+  }
   activeDuration = modeDuration();
   remaining = activeDuration;
   updateTimer();
@@ -182,8 +190,8 @@ function finishSession({ early = false } = {}) {
   if (completedFocus && state.experience.active === 'brota') celebration.request(state.celebration);
 }
 
-function advanceFocus() {
-  if (mode !== 'focus' || document.querySelector('dialog[open]')) return;
+function advanceStage() {
+  if (document.querySelector('dialog[open]')) return;
   if (interval && endsAt) remaining = Math.max(0, (endsAt - Date.now()) / 1000);
   finishSession({ early: true });
 }
@@ -415,6 +423,8 @@ function fillSettingsForm(settings = state.settings) {
   $('#cycle-length').value = settings.cycle;
   renderFocusDurationInputs(settings.cycle, settings.focusDurations);
   $('#sound-toggle').checked = settings.sound;
+  $('#dog-enabled-toggle').checked = settings.dogEnabled;
+  $('#dog-sound-toggle').checked = settings.dogSound;
   const selectedAlarm = $(`#alarm-options input[value="${settings.alarm}"]`);
   if (selectedAlarm) selectedAlarm.checked = true;
   $('#notification-toggle').checked = settings.notifications;
@@ -490,6 +500,8 @@ function saveSettings(event) {
     long: numberValue('#long-length', 1, 90, DEFAULT_SETTINGS.long),
     cycle,
     sound: $('#sound-toggle').checked,
+    dogEnabled: $('#dog-enabled-toggle').checked,
+    dogSound: $('#dog-sound-toggle').checked,
     alarm: $('#alarm-options input:checked')?.value || DEFAULT_SETTINGS.alarm,
     notifications: notificationsRequested,
     color: selectedColor,
@@ -548,7 +560,7 @@ $('.mode-switch').addEventListener('click', (event) => {
 });
 elements.start.addEventListener('click', startTimer);
 elements.reset.addEventListener('click', resetTimer);
-elements.advanceFocus.addEventListener('click', advanceFocus);
+elements.advanceFocus.addEventListener('click', advanceStage);
 $('#cycle-reset-open').addEventListener('click', () => elements.cycleResetDialog.showModal());
 $('#cycle-reset-confirm').addEventListener('click', resetCycle);
 $('#cycle-reset-cancel').addEventListener('click', () => elements.cycleResetDialog.close());
@@ -557,6 +569,14 @@ elements.cycleResetDialog.addEventListener('click', (event) => {
   if (event.target === elements.cycleResetDialog) elements.cycleResetDialog.close();
 });
 $('#settings-open').addEventListener('click', openSettings);
+for (const kind of ['bark', 'eat']) {
+  $(`#max-preview-${kind}`).addEventListener('click', () => {
+    stopAlarmPreview();
+    maxPreview.unlock();
+    maxPreview.play(kind);
+  });
+}
+elements.dialog.addEventListener('close', () => maxPreview.stop());
 $('#settings-close').addEventListener('click', discardSettings);
 elements.form.addEventListener('submit', saveSettings);
 $('#reset-settings').addEventListener('click', restoreSettings);
@@ -594,7 +614,7 @@ $('#alarm-options').innerHTML = ALARMS.map((alarm) => `
 `).join('');
 $('#alarm-options').addEventListener('click', (event) => {
   const button = event.target.closest('[data-preview-alarm]');
-  if (button) previewAlarm(button);
+  if (button) { maxPreview.stop(); previewAlarm(button); }
 });
 $('#alarm-options').addEventListener('change', stopAlarmPreview);
 document.addEventListener('visibilitychange', () => {
