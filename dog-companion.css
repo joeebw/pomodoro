@@ -20,7 +20,8 @@
 .dog-companion[data-action="stretch"] .dog-body { transform: scaleX(1.1) scaleY(.7); }
 .dog-companion[data-action="stretch"] .dog-head { transform: translate(1px,4px); }
 .dog-companion[data-action="play"] .dog-sprite { animation: dog-hop .6s steps(4,end) infinite; }
-.dog-companion[data-action="bark"] .dog-head { animation: dog-bark .3s steps(2,end) 4; }
+.dog-companion[data-action="pant"] .dog-head { animation: dog-pant .45s ease-in-out infinite alternate; }
+.dog-companion[data-action="pant"] .dog-jaw { animation: dog-chew .45s ease-in-out infinite; }
 .dog-companion[data-action="scratch"] .dog-back-leg { animation: dog-scratch .18s steps(2,end) infinite alternate; }
 .dog-companion[data-action="scratch"] .dog-body { transform: translate(2px,2px) scaleX(.8); }
 .dog-companion[data-action="shake"] .dog-sprite { animation: dog-shake .15s steps(2,end) infinite alternate; }
@@ -33,7 +34,7 @@
 .dog-companion[data-action="poop"] .dog-head { animation: dog-poop-head 3.2s ease-in-out both; }
 .dog-companion[data-action="poop"] .dog-ear { transform: rotate(8deg); }
 .dog-companion[data-action="lick"] .dog-lick-tongue { display: inline; transform-origin: 44px 22px; animation: dog-lick .6s steps(3,end) 2 both; }
-.dog-companion:is([data-action="bark"],[data-action="play"],[data-action="wag"],[data-action="yawn"]) .dog-tongue { display: inline; }
+.dog-companion:is([data-action="pant"],[data-action="play"],[data-action="wag"],[data-action="yawn"]) .dog-tongue { display: inline; }
 .dog-companion[data-action="sleep"] .dog-awake { display: none; }
 .dog-companion[data-action="sleep"] .dog-asleep { display: inline; transform-origin: 25px 29px; animation: dog-breathe 3s ease-in-out infinite; }
 .dog-companion[data-action="sleep"] .dog-dream { display: block; }
@@ -41,7 +42,18 @@
 .dog-dream i { position: absolute; bottom: 0; left: 0; font: 700 12px ui-monospace,monospace; opacity: 0; animation: dog-dream 3s ease-out infinite; text-shadow: 0 0 3px var(--surface); }
 .dog-dream i:nth-child(2) { left: 9px; font-size: 14px; animation-delay: 1s; }
 .dog-dream i:nth-child(3) { left: 18px; font-size: 17px; animation-delay: 2s; }
-.max-feed-button { min-height: 44px; }
+[data-experience] .max-feed-button {
+  min-width: 44px; min-height: 44px; color: #49240c;
+  background: linear-gradient(135deg, #ffe286, #ffac54);
+  border: 1px solid #e9a245; box-shadow: 0 2px 9px #e99b3333;
+}
+[data-experience] .max-feed-button:hover {
+  color: #392007; background: linear-gradient(135deg, #ffebaa, #ffc36c);
+  box-shadow: 0 3px 12px #e99b3355; transform: translateY(-1px);
+}
+[data-experience] .max-feed-button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+[data-experience] .max-feed-button:disabled { opacity: .55; transform: none; box-shadow: none; }
+.max-feed-button svg { stroke-width: 1.8; }
 .max-sound-previews { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
 .max-care { position: fixed; inset: 0; z-index: 21; pointer-events: none; }
 .max-bowl,.max-poop { position: absolute; left: 0; top: 0; width: 44px; height: 44px; border: 0; padding: 0; background: transparent; pointer-events: auto; cursor: pointer; }
@@ -59,7 +71,7 @@
 @keyframes dog-ear { to { transform: rotate(12deg); } }
 @keyframes dog-sniff { to { transform: translate(1px,4px) rotate(12deg); } }
 @keyframes dog-hop { 50% { bottom: 22px; } }
-@keyframes dog-bark { to { transform: translate(1px,-2px); } }
+@keyframes dog-pant { to { transform: translate(1px,-2px); } }
 @keyframes dog-scratch { to { transform: translate(5px,-6px) rotate(-40deg); } }
 @keyframes dog-shake { to { margin-left: 2px; } }
 @keyframes dog-yawn { 40%,65% { transform: scaleY(2.5) translateY(1px); } }

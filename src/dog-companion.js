@@ -30,8 +30,8 @@ export function createDogCompanion() {
   let positioned = false;
   let timer, frame, heartbeat;
   let lastPulse = 0, awakeTime = 0;
-  let nextBark = randomDelay(45000, 90000), nextPoop = randomDelay(180000, 360000);
-  let lastBark = -Infinity, lastReaction = -Infinity;
+  let nextPant = randomDelay(45000, 90000), nextPoop = randomDelay(180000, 360000);
+  let lastPant = -Infinity, lastReaction = -Infinity;
   let approachArmed = true, reactionIndex = 0;
   let obstacles = [], viewport;
   const recent = [];
@@ -53,7 +53,7 @@ export function createDogCompanion() {
   function pose(action) {
     audio.stop();
     dog.dataset.action = action;
-    bubble.textContent = action === 'bark' ? '¡Guau!' : '';
+    bubble.textContent = '';
     const effect = action === 'scratch' ? 'scratch' : action === 'poop' ? 'poop'
       : ['lick', 'wag', 'play', 'yawn'].includes(action) ? 'lick' : null;
     if (effect && sound && !sleeping && !blocked()) audio.play(effect, 0, { delay: effect === 'poop' ? .55 : 0 });
@@ -143,11 +143,11 @@ export function createDogCompanion() {
     stopActivity();
     timer = setTimeout(() => { care.clearMeal(false); rest(); }, 1300);
   }
-  function bark() {
-    if (performance.now() - lastBark < 10000 || care.meal || sleeping || blocked() || care.placing) return false;
-    stopActivity(); lastBark = performance.now(); pose('bark');
-    if (sound) audio.play('bark');
-    timer = setTimeout(rest, 1800);
+  function pant() {
+    if (performance.now() - lastPant < 10000 || care.meal || sleeping || blocked() || care.placing) return false;
+    stopActivity(); lastPant = performance.now(); pose('pant');
+    if (sound) audio.play('pant');
+    timer = setTimeout(rest, 3800);
     return true;
   }
   function pulse() {
@@ -175,9 +175,9 @@ export function createDogCompanion() {
         return;
       }
     }
-    if (awakeTime >= nextBark && dog.dataset.action !== 'poop') {
-      nextBark = awakeTime + randomDelay(45000, 90000);
-      bark();
+    if (awakeTime >= nextPant && dog.dataset.action !== 'poop') {
+      nextPant = awakeTime + randomDelay(45000, 90000);
+      pant();
     }
   }
   function syncEnvironment(force = false) {
@@ -225,7 +225,7 @@ export function createDogCompanion() {
         if (route) { walk(route, rest, 100); return; }
       }
     }
-    if (reaction === 2 && bark()) return;
+    if (reaction === 2 && pant()) return;
     stopActivity(); pose(reaction === 1 ? 'play' : 'wag'); timer = setTimeout(rest, 1200);
   }
   document.addEventListener('pointermove', react, { passive: true });

@@ -28,6 +28,7 @@ const elements = {
 const ringLength = 2 * Math.PI * 147;
 const settingsSections = createSettingsSections(elements.dialog, (section) => {
   if (section.id === 'alarm-section') stopAlarmPreview();
+  if (section.id === 'max-section') maxPreview.stop();
 });
 let state = loadState();
 const experienceCopy = () => getExperienceCopy(state.experience.active);
@@ -569,7 +570,7 @@ elements.cycleResetDialog.addEventListener('click', (event) => {
   if (event.target === elements.cycleResetDialog) elements.cycleResetDialog.close();
 });
 $('#settings-open').addEventListener('click', openSettings);
-for (const kind of ['bark', 'eat', 'poop', 'scratch', 'lick']) {
+for (const kind of ['pant', 'eat', 'poop', 'scratch', 'lick']) {
   $(`#max-preview-${kind}`).addEventListener('click', () => {
     stopAlarmPreview();
     maxPreview.unlock();

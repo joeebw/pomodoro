@@ -25,25 +25,25 @@ test('real audio buffers resume at the requested offset and cancelled loads cann
     }
   }
   globalThis.window = { AudioContext };
-  globalThis.fetch = async (url) => ({ ok: true, arrayBuffer: async () => new Uint8Array([url.includes('bark') ? 1 : 2]).buffer });
+  globalThis.fetch = async (url) => ({ ok: true, arrayBuffer: async () => new Uint8Array([url.includes('pant') ? 1 : 2]).buffer });
   const settle = () => new Promise((resolve) => setImmediate(resolve));
   try {
     const audio = createDogAudio();
-    audio.play('bark');
+    audio.play('pant');
     await settle();
     assert.equal(starts.length, 0, 'no playback before a user gesture unlocks audio');
     audio.unlock();
-    audio.play('bark');
+    audio.play('pant');
     audio.play('eat', 2.5);
     await settle();
     assert.deepEqual(starts, [{ duration: 6.7, when: 0, offset: 2.5 }]);
     audio.stop();
     assert.equal(stops, 1);
-    audio.play('bark');
+    audio.play('pant');
     audio.stop();
     await settle();
-    assert.equal(starts.length, 1, 'a cancelled request cannot produce a late bark');
-    audio.play('bark');
+    assert.equal(starts.length, 1, 'a cancelled request cannot produce a late pant');
+    audio.play('pant');
     await settle();
     assert.deepEqual(starts.at(-1), { duration: 1.6, when: 0, offset: 0 });
     audio.stop();
