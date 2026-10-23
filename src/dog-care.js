@@ -24,7 +24,11 @@ export function createDogCare({ planMeal, onMealChange }) {
   function renderButton() {
     feed.disabled = placing || Boolean(meal);
     feed.hidden = !enabled;
-    feed.textContent = meal ? 'Comida servida para Max' : 'Darle de comer';
+    const label = meal ? 'Comida servida para Max' : 'Darle de comer a Max';
+    feed.setAttribute('aria-label', label);
+    feed.title = label;
+    const text = feed.querySelector('.max-feed-label');
+    if (text) text.textContent = label; else feed.textContent = label;
   }
   function cancel(restoreFocus = false, notify = true) {
     const wasPlacing = placing;

@@ -1,5 +1,5 @@
 // Incrementa esta versión al cambiar los recursos precargados de la aplicación.
-const CACHE_NAME = 'brota-shell-v30';
+const CACHE_NAME = 'brota-shell-v31';
 const APP_FILES = [
   '/',
   '/index.html',

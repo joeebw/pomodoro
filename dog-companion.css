@@ -39,8 +39,7 @@
 .dog-dream i { position: absolute; bottom: 0; left: 0; font: 700 12px ui-monospace,monospace; opacity: 0; animation: dog-dream 3s ease-out infinite; text-shadow: 0 0 3px var(--surface); }
 .dog-dream i:nth-child(2) { left: 9px; font-size: 14px; animation-delay: 1s; }
 .dog-dream i:nth-child(3) { left: 18px; font-size: 17px; animation-delay: 2s; }
-.max-feed-button { display: flex; margin: 2px auto 0; min-height: 44px; }
-[data-experience="writer"] .max-feed-button { order: 6; }
+.max-feed-button { min-height: 44px; }
 .max-sound-previews { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; }
 .max-care { position: fixed; inset: 0; z-index: 21; pointer-events: none; }
 .max-bowl,.max-poop { position: absolute; left: 0; top: 0; width: 44px; height: 44px; border: 0; padding: 0; background: transparent; pointer-events: auto; cursor: pointer; }
@@ -71,4 +70,9 @@
   .dog-dream i { opacity: .8; transform: none; }
   .dog-dream i:nth-child(2) { bottom: 5px; }.dog-dream i:nth-child(3) { bottom: 10px; }
   .max-cleaned { transition: none; }
+}
+@media (max-width: 480px) {
+  [data-experience] .topbar-right { gap: 6px; }
+  .header-stats { gap: 4px 8px; }
+  .daily-sessions { padding-left: 8px; }
 }

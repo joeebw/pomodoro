@@ -42,7 +42,7 @@ En las pausas corta y larga ese mismo botón cambia a **Adelantar descanso**. Te
 
 Al comenzar el enfoque, Max se detiene y **duerme exactamente donde está**, con respiración suave y letras de sueño flotantes. Despierta al pausar o entrar en descanso. Se oculta con los diálogos y detiene actividad y audio con la pestaña oculta. Con movimiento reducido usa poses estáticas.
 
-Pulsa **Darle de comer** y elige un espacio libre con clic o toque; también puedes usar las flechas y Enter o cancelar con Escape. Solo habrá un plato. Max camina hasta él, come durante unos siete segundos con una grabación real de un perro masticando y después retoma su actividad. Puedes retirar el plato tocándolo. Si está dormido, la comida espera a que despierte. Si comienza el enfoque mientras come, duerme ahí mismo y conserva la porción pendiente.
+En la barra superior, junto a Ajustes, pulsa el **icono del plato** para darle de comer y elige un espacio libre con clic o toque; también puedes usar las flechas y Enter o cancelar con Escape. Solo habrá un plato. Max camina hasta él, come durante unos siete segundos con una grabación real de un perro masticando y después retoma su actividad. Puedes retirar el plato tocándolo. Si está dormido, la comida espera a que despierte. Si comienza el enfoque mientras come, duerme ahí mismo y conserva la porción pendiente.
 
 Cada 3–6 minutos de actividad despierto puede hacer popó, con un máximo de tres piezas. Límpialas con clic, toque o teclado. Se retiran al comenzar el enfoque; al ocultar a Max o recargar se retiran también la comida y todas las piezas. Estos objetos no se guardan entre visitas.
 
