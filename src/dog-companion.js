@@ -262,7 +262,8 @@ export function createDogCompanion({ onServe }) {
   window.addEventListener('scroll', () => syncEnvironment(true), { passive: true });
   reducedMotion.addEventListener('change', () => syncEnvironment(true));
   return {
-    update({ mode, running, enabled: showDog, sound: dogSound, progress }) {
+    update({ mode, running, enabled: showDog, sound: dogSound, progress, volume }) {
+      audio.setVolume(volume);
       const wasSleeping = sleeping;
       enabled = showDog; sound = dogSound; sleeping = mode === 'focus' && running;
       const growth = dogGrowth(progress);

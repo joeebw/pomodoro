@@ -70,6 +70,10 @@
 [data-experience] .max-feed-button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 [data-experience] .max-feed-button:disabled { opacity: .55; transform: none; box-shadow: none; }
 .max-feed-button svg { stroke-width: 1.8; }
+.max-volume { gap: 12px; flex-wrap: wrap; }
+.max-volume > span:last-child { display: flex; align-items: center; gap: 10px; }
+.max-volume input { width: 130px; accent-color: var(--accent); }
+.max-volume output { min-width: 42px; font-size: 12px; color: var(--ink); }
 .max-growth { color: var(--ink); font-size: 12px; line-height: 1.6; }
 .max-care-hint,.max-audio-credits { color: var(--muted); font-size: 11px; line-height: 1.6; margin: 0 0 12px; }
 .max-audio-credits a { color: var(--ink); }

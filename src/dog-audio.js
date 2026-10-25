@@ -12,7 +12,8 @@ const VOLUMES = { bark: .4, pant: .45, eat: .65, poop: .3, scratch: .45, lick: .
 // offline, where cached responses do not necessarily support HTTP byte ranges.
 export function createDogAudio() {
   let context;
-  let active;
+  let active, activeGain, activeKind;
+  let volume = 1;
   let version = 0;
   const buffers = new Map();
   function load(kind) {
@@ -35,6 +36,11 @@ export function createDogAudio() {
     }
   }
   return {
+    setVolume(value) {
+      volume = Number.isFinite(Number(value)) ? Math.min(100, Math.max(0, Number(value))) / 100 : 1;
+      if (volume === 0) stop();
+      else if (active && activeGain) activeGain.gain.value = VOLUMES[activeKind] * volume;
+    },
     unlock() {
       const AudioContext = window.AudioContext || window.webkitAudioContext;
       if (!AudioContext) return;
@@ -46,17 +52,17 @@ export function createDogAudio() {
     },
     play(kind, offset = 0, { delay = 0 } = {}) {
       stop();
-      if (!context || !SOURCES[kind]) return;
+      if (!context || !SOURCES[kind] || volume === 0) return;
       const request = version;
       load(kind).then((buffer) => {
         if (request !== version || context.state !== 'running' || offset >= buffer.duration) return;
         const source = context.createBufferSource();
         const gain = context.createGain();
         source.buffer = buffer;
-        gain.gain.value = VOLUMES[kind];
+        gain.gain.value = VOLUMES[kind] * volume;
         source.connect(gain).connect(context.destination);
         source.onended = () => { source.disconnect(); gain.disconnect(); if (active === source) active = null; };
-        active = source;
+        active = source; activeGain = gain; activeKind = kind;
         source.start(delay > 0 ? context.currentTime + delay : 0, Math.max(0, offset));
       }).catch(() => {});
     },

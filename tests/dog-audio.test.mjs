@@ -6,6 +6,7 @@ test('real audio buffers resume at the requested offset and cancelled loads cann
   const previousFetch = globalThis.fetch;
   const previousWindow = globalThis.window;
   const starts = [];
+  const gains = [];
   let stops = 0;
   class AudioContext {
     state = 'running';
@@ -13,7 +14,7 @@ test('real audio buffers resume at the requested offset and cancelled loads cann
     destination = {};
     resume() { return Promise.resolve(); }
     decodeAudioData(data) { return Promise.resolve({ duration: new Uint8Array(data)[0] === 1 ? 1.6 : 6.7 }); }
-    createGain() { return { gain: { value: 0 }, connect() {}, disconnect() {} }; }
+    createGain() { const gain = { gain: { value: 0 }, connect() {}, disconnect() {} }; gains.push(gain); return gain; }
     createBufferSource() {
       return {
         buffer: null,
@@ -46,6 +47,14 @@ test('real audio buffers resume at the requested offset and cancelled loads cann
     audio.play('pant');
     await settle();
     assert.deepEqual(starts.at(-1), { duration: 1.6, when: 0, offset: 0 });
+    audio.setVolume(25);
+    assert.equal(gains.at(-1).gain.value, .45 * .25, 'volume updates current playback');
+    audio.setVolume(0);
+    const count = starts.length;
+    audio.play('bark');
+    await settle();
+    assert.equal(starts.length, count, 'zero volume does not start another recording');
+    audio.setVolume(100);
     audio.stop();
     for (const kind of ['bark', 'poop', 'scratch', 'lick']) {
       audio.play(kind, 0, { delay: kind === 'poop' ? .55 : 0 });

@@ -15,6 +15,7 @@ export const DEFAULT_SETTINGS = {
   sound: true,
   dogEnabled: true,
   dogSound: true,
+  dogVolume: 100,
   alarm: DEFAULT_ALARM,
   notifications: true,
 };
@@ -47,6 +48,7 @@ function migrateSettings(savedSettings = {}) {
     ...savedSettings,
     dogEnabled: typeof savedSettings.dogEnabled === 'boolean' ? savedSettings.dogEnabled : true,
     dogSound: typeof savedSettings.dogSound === 'boolean' ? savedSettings.dogSound : true,
+    dogVolume: boundedInteger(savedSettings.dogVolume, 0, 100, DEFAULT_SETTINGS.dogVolume),
     theme: ['light', 'dark', 'system'].includes(savedSettings.theme) ? savedSettings.theme : 'light',
     alarm: isValidAlarm(savedSettings.alarm) ? savedSettings.alarm : DEFAULT_ALARM,
     cycle,

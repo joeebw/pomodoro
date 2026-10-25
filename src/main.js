@@ -98,7 +98,7 @@ function updateTimer() {
   setWriterMachineRunning(Boolean(interval));
   const growth = dogGrowth(state.dog);
   $('#max-growth').textContent = `${growth.stage} · ${growth.sessions} ${growth.sessions === 1 ? 'sesión' : 'sesiones'} juntos. ${growth.remaining ? `Será adulto a las 60 sesiones.` : '¡Max ya es adulto!'} Comidas disponibles: ${state.dog.meals}.`;
-  dogCompanion.update({ mode, running: Boolean(interval), enabled: state.settings.dogEnabled, sound: state.settings.dogSound, progress: state.dog });
+  dogCompanion.update({ mode, running: Boolean(interval), enabled: state.settings.dogEnabled, sound: state.settings.dogSound, progress: state.dog, volume: state.settings.dogVolume });
   elements.timer.textContent = formatTime(remaining);
   elements.ring.style.strokeDasharray = ringLength;
   elements.ring.style.strokeDashoffset = ringLength * (1 - Math.max(0, remaining / activeDuration));
@@ -438,6 +438,8 @@ function fillSettingsForm(settings = state.settings) {
   $('#sound-toggle').checked = settings.sound;
   $('#dog-enabled-toggle').checked = settings.dogEnabled;
   $('#dog-sound-toggle').checked = settings.dogSound;
+  $('#dog-volume').value = settings.dogVolume;
+  $('#dog-volume-value').textContent = `${settings.dogVolume} %`;
   const selectedAlarm = $(`#alarm-options input[value="${settings.alarm}"]`);
   if (selectedAlarm) selectedAlarm.checked = true;
   $('#notification-toggle').checked = settings.notifications;
@@ -515,6 +517,7 @@ function saveSettings(event) {
     sound: $('#sound-toggle').checked,
     dogEnabled: $('#dog-enabled-toggle').checked,
     dogSound: $('#dog-sound-toggle').checked,
+    dogVolume: numberValue('#dog-volume', 0, 100, DEFAULT_SETTINGS.dogVolume),
     alarm: $('#alarm-options input:checked')?.value || DEFAULT_SETTINGS.alarm,
     notifications: notificationsRequested,
     color: selectedColor,
@@ -585,10 +588,15 @@ $('#settings-open').addEventListener('click', openSettings);
 for (const kind of ['bark', 'pant', 'eat', 'poop', 'scratch', 'lick']) {
   $(`#max-preview-${kind}`).addEventListener('click', () => {
     stopAlarmPreview();
+    maxPreview.setVolume(Number($('#dog-volume').value));
     maxPreview.unlock();
     maxPreview.play(kind);
   });
 }
+$('#dog-volume').addEventListener('input', (event) => {
+  $('#dog-volume-value').textContent = `${event.target.value} %`;
+  maxPreview.setVolume(Number(event.target.value));
+});
 elements.dialog.addEventListener('close', () => maxPreview.stop());
 $('#settings-close').addEventListener('click', discardSettings);
 elements.form.addEventListener('submit', saveSettings);
