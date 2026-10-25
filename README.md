@@ -2,6 +2,8 @@
 
 Pomodoro minimalista con temporizador configurable, descansos, ciclos de enfoque y el camino del campeón: etapas de preparación y un cinturón por ciclo completado. La configuración y el progreso se guardan localmente en el navegador; no hay backend.
 
+La guía para trabajar en el repositorio con agentes está en [AGENTS.md](AGENTS.md): arquitectura, compatibilidad, validación y commits por hitos completos.
+
 ## Ejecutar
 
 Desde esta carpeta, inicia un servidor estático:
