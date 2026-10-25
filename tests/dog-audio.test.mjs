@@ -6,6 +6,7 @@ test('real audio buffers resume at the requested offset and cancelled loads cann
   const previousFetch = globalThis.fetch;
   const previousWindow = globalThis.window;
   const starts = [];
+  const durations = [];
   const gains = [];
   let stops = 0;
   class AudioContext {
@@ -20,7 +21,7 @@ test('real audio buffers resume at the requested offset and cancelled loads cann
         buffer: null,
         connect(gain) { return gain; },
         disconnect() {},
-        start(when, offset) { starts.push({ duration: this.buffer.duration, when, offset }); },
+        start(when, offset, duration) { durations.push(duration); starts.push({ duration: this.buffer.duration, when, offset }); },
         stop() { stops++; this.onended?.(); },
       };
     }
@@ -56,13 +57,17 @@ test('real audio buffers resume at the requested offset and cancelled loads cann
     assert.equal(starts.length, count, 'zero volume does not start another recording');
     audio.setVolume(100);
     audio.stop();
-    for (const kind of ['bark', 'poop', 'scratch', 'lick']) {
+    for (const kind of ['bark', 'poop', 'scratch', 'lick', 'bottle']) {
       audio.play(kind, 0, { delay: kind === 'poop' ? .55 : 0 });
       await settle();
       assert.equal(starts.at(-1).when, kind === 'poop' ? 100.55 : 0);
       assert.equal(starts.at(-1).offset, 0);
       audio.stop();
     }
+    audio.play('bottle', 0, { duration: .5 });
+    await settle();
+    assert.equal(durations.at(-1), .5, 'toy sounds stop at the action duration');
+    audio.stop();
   } finally {
     globalThis.fetch = previousFetch;
     if (previousWindow === undefined) delete globalThis.window; else globalThis.window = previousWindow;

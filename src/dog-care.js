@@ -11,7 +11,7 @@ export function createDogCare({ planMeal, onMealChange, onServe }) {
   const preview = layer.querySelector('.max-bowl-preview');
   let placing = false;
   let enabled = true;
-  let meals = 0, sleeping = false;
+  let meals = 0, sleeping = false, playing = false;
   let meal = null;
   let cursor = { x: innerWidth / 2, y: innerHeight / 2 };
   const poops = new Set();
@@ -23,9 +23,9 @@ export function createDogCare({ planMeal, onMealChange, onServe }) {
     preview.style.transform = `translate(${p.x}px, ${p.y}px)`;
   }
   function renderButton() {
-    feed.disabled = placing || Boolean(meal) || meals === 0 || sleeping;
+    feed.disabled = placing || Boolean(meal) || meals === 0 || sleeping || playing;
     feed.hidden = !enabled;
-    const label = meal ? 'Comida servida para Max' : sleeping ? 'Max duerme: dale de comer al terminar el enfoque'
+    const label = playing ? 'Max está jugando: espera a que regrese' : meal ? 'Comida servida para Max' : sleeping ? 'Max duerme: dale de comer al terminar el enfoque'
       : meals === 0 ? 'Completa una sesión de enfoque para darle de comer a Max' : `Darle de comer a Max (${meals} ${meals === 1 ? 'comida disponible' : 'comidas disponibles'})`;
     feed.setAttribute('aria-label', label);
     feed.title = label;
@@ -68,7 +68,7 @@ export function createDogCare({ planMeal, onMealChange, onServe }) {
     onMealChange();
   }
   feed.addEventListener('click', () => {
-    if (!enabled || meal || !meals || sleeping) return;
+    if (!enabled || meal || !meals || sleeping || playing) return;
     placing = true;
     toolbar.hidden = false; preview.hidden = false;
     message.textContent = 'Elige un espacio libre para el plato. También puedes usar las flechas y Enter.';
@@ -111,6 +111,7 @@ export function createDogCare({ planMeal, onMealChange, onServe }) {
       if (meal) meal.element.hidden = !canShow(meal.point);
       for (const element of poops) element.hidden = !canShow(poopLocations.get(element));
     },
+    setPlaying(value) { playing = value; renderButton(); },
     setFeeding({ available, asleep }) {
       meals = available; sleeping = asleep;
       if (sleeping || meals === 0) cancel(false, false);

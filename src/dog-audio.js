@@ -1,4 +1,5 @@
 const SOURCES = {
+  bottle: new URL('../assets/audio/max-bottle.wav', import.meta.url).href,
   bark: new URL('../assets/audio/max-bark.mp3', import.meta.url).href,
   pant: new URL('../assets/audio/max-pant.wav', import.meta.url).href,
   eat: new URL('../assets/audio/max-eat.mp3', import.meta.url).href,
@@ -6,7 +7,7 @@ const SOURCES = {
   scratch: new URL('../assets/audio/max-scratch.wav', import.meta.url).href,
   lick: new URL('../assets/audio/max-lick.wav', import.meta.url).href,
 };
-const VOLUMES = { bark: .4, pant: .45, eat: .65, poop: .3, scratch: .45, lick: .45 };
+const VOLUMES = { bottle: .45, bark: .4, pant: .45, eat: .65, poop: .3, scratch: .45, lick: .45 };
 
 // Decode the real recordings once. Buffer playback can resume accurately even
 // offline, where cached responses do not necessarily support HTTP byte ranges.
@@ -50,7 +51,7 @@ export function createDogAudio() {
         for (const kind of Object.keys(SOURCES)) load(kind).catch(() => {});
       } catch { /* Visual actions still work if browser audio is unavailable. */ }
     },
-    play(kind, offset = 0, { delay = 0 } = {}) {
+    play(kind, offset = 0, { delay = 0, duration } = {}) {
       stop();
       if (!context || !SOURCES[kind] || volume === 0) return;
       const request = version;
@@ -63,7 +64,9 @@ export function createDogAudio() {
         source.connect(gain).connect(context.destination);
         source.onended = () => { source.disconnect(); gain.disconnect(); if (active === source) active = null; };
         active = source; activeGain = gain; activeKind = kind;
-        source.start(delay > 0 ? context.currentTime + delay : 0, Math.max(0, offset));
+        const when = delay > 0 ? context.currentTime + delay : 0;
+        if (Number.isFinite(duration) && duration > 0) source.start(when, Math.max(0, offset), duration);
+        else source.start(when, Math.max(0, offset));
       }).catch(() => {});
     },
     stop,

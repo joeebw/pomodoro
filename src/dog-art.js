@@ -36,6 +36,7 @@ export const DOG_ART = `
         <path fill="#30281f" d="M43 15h5v4h-5z"/><path class="dog-eye" fill="#30281f" d="M39 11h2v3h-2z"/>
         <path fill="#8d512f" d="M38 14h4v1h-4z"/>
         <g class="dog-jaw"><path fill="#e1caaa" d="M36 23h9v2h-9z"/><path class="dog-tongue" fill="#e89594" d="M39 24h3v3h-3z"/></g>
+        <g class="dog-carried-toy" transform="translate(37 22) scale(.28)"></g>
         <path class="dog-lick-tongue" fill="#e89594" d="M42 20h3v4h-2v-1h-1z"/>
         <path fill="#b84239" d="M31 23h5v3h-5z"/><path fill="#efce76" d="M34 26h2v2h-2z"/>
       </g>
@@ -52,3 +53,8 @@ export const DOG_ART = `
 
 export const BOWL_ART = `<svg viewBox="0 0 44 36" aria-hidden="true" shape-rendering="crispEdges"><g class="max-kibble" fill="#aa6838"><path d="M9 12h6v5H9zM18 10h6v7h-6zM28 12h6v6h-6z"/><path fill="#d5a15e" d="M14 13h5v5h-5zM24 12h5v6h-5z"/></g><path fill="#7b9b9b" d="M5 17h34l-4 12H9z"/><path fill="#a6c2bc" d="M4 17h36v4H4z"/><path fill="#446c71" d="M10 27h24v3H10z"/><path fill="#e5d8b8" d="M20 22h4v3h-4z"/></svg>`;
 export const POOP_ART = `<svg viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges"><path fill="#75432a" d="M12 6h6v5h4v6h4v4h3v6H3v-6h4v-5h5z"/><path fill="#aa7145" d="M12 11h7v3h-7zM8 18h15v3H8zM5 24h21v2H5z"/></svg>`;
+
+export const TOY_ART = {
+  bone: `<svg viewBox="0 0 44 44" aria-hidden="true" shape-rendering="crispEdges"><path fill="#c9a66c" d="M9 10h7v5l13 10h6v10h-8v-4L14 21H8V11z"/><path fill="#f6e1af" d="M6 7h7v4h5v6l13 10h5v-4h6v7h-4v8h-7v-4h-5v-5L13 19H8v4H2v-7h4z"/></svg>`,
+  bottle: `<svg viewBox="0 0 44 44" aria-hidden="true" shape-rendering="crispEdges"><path fill="#659cbb" d="M17 3h10v7H17z"/><path fill="#a4dbdf" d="M17 10h10v5l5 6v17H12V21l5-6z"/><path fill="#d3f4ed" d="M16 20h4v14h-4z"/><path fill="#638dba" d="M12 24h20v7H12z"/><path fill="#f4ead4" d="M18 25h9v5h-9z"/></svg>`,
+};

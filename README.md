@@ -54,7 +54,11 @@ En Ajustes, **Mostrar a Max** y **Sonidos de Max** conservan las preferencias an
 
 Cada enfoque completado (incluido «Adelantar enfoque») desbloquea una comida. Los descansos, los ajustes manuales y los reinicios no dan comidas ni crecimiento. No se puede servir durante el enfoque en marcha. Las comidas disponibles se guardan y se consumen al colocar un plato válido. Max empieza como cachorro al recibir esta actualización y crece gradualmente del 62 % al 100 % de su tamaño adulto en **60 enfoques completados**; el progreso aparece en Ajustes y se conserva al recargar, cambiar de día, ocultarlo o reiniciar ciclos. El total editable de sesiones no altera su edad. Si no encuentra espacio para hacer popó, busca una ruta a un lugar libre y reintenta sin esperar otro intervalo completo.
 
-Max, la comida y sus sonidos funcionan sin conexión.
+El **botón verde del hueso**, junto al plato de comida, permite jugar con Max: elige **Hueso** o **Botella de plástico** y pulsa un espacio libre para lanzarlo. También puedes usar flechas y Enter; Escape cancela. El punto de regreso queda marcado donde Max empezó la ronda. Valida espacio y rutas de ida y vuelta antes de lanzar; Max trota hasta el juguete, lo recoge, lo lleva en el hocico y vuelve a dejarlo. El hueso usa su grabación real de masticación y la botella un crujido real de plástico. Al volver puedes pulsar el juguete para lanzarlo otra vez. El juego no consume comida ni cambia sesiones o crecimiento.
+
+Mientras juega no come ni responde al puntero. El juego no está disponible durante el enfoque en marcha, al servir/comer o con Max oculto. Comenzar el enfoque, abrir un diálogo, ocultar la pestaña, cambiar el tamaño de la ventana o desplazar la página cancela la ronda y retira el juguete, para conservar rutas seguras; Max duerme donde se encuentre al comenzar el enfoque. El juego y sus objetos no se guardan al recargar. Con movimiento reducido, el lanzamiento y los desplazamientos son instantáneos y las poses son estáticas.
+
+Max, la comida, el juego y sus sonidos funcionan sin conexión.
 
 El botón **Reiniciar ciclo**, debajo del progreso, pide confirmación antes de volver a la primera sesión. Al confirmar se detiene el reloj, se recupera la duración configurada para esa sesión y se borra únicamente el avance del ciclo actual. Los cinturones, las sesiones completadas y la configuración se conservan. Cancelar, cerrar con la X, pulsar Escape o tocar fuera del modal permite seguir con el ciclo; abrir la confirmación no pausa ni reinicia el reloj. Está disponible también en Escritor.
 
