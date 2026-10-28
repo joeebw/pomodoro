@@ -31,7 +31,7 @@ Abre `http://127.0.0.1:8000`. No uses `file://`: la aplicación necesita cargar 
 | Ajuste manual de sesiones del día | `src/daily-session-controls.js` |
 | Experiencias, identidad y tema | `src/experiences.js`, `src/brand.js`, `src/theme.js` |
 | Celebración y experiencia Escritor | `src/session-celebration.js`, `src/writer-*.js`, `src/champion-art.js` |
-| Conducta, cuidados, rutas, progreso, sonido y gráficos de Max | `src/dog-companion.js`, `src/dog-care.js`, `src/dog-fetch.js`, `src/dog-movement.js`, `src/dog-progress.js`, `src/dog-audio.js`, `src/dog-art.js` |
+| Conducta, cuidados, rutas, progreso, sonido y gráficos de Max | `src/dog-companion.js`, `src/dog-behavior.js`, `src/dog-care.js`, `src/dog-fetch.js`, `src/dog-movement.js`, `src/dog-progress.js`, `src/dog-audio.js`, `src/dog-art.js` |
 | Panel de Max y colocación compartida de objetos | `src/max-panel.js`, `src/max-placement.js` |
 | Catálogos y selección de citas | `src/quotes.js`, `src/athlete-quotes.js`, `src/classic-quotes.js`, `src/writer-quotes.js` |
 | Instalación y recursos sin conexión | `src/pwa.js`, `sw.js`, `manifest.webmanifest` |
@@ -55,7 +55,7 @@ Estas son las reglas actuales, salvo que el usuario solicite cambiarlas explíci
 - Los ajustes manuales de sesiones modifican los contadores y el campeonato, sin alterar el tiempo restante ni dar comida o crecimiento a Max. Ningún contador debe ser negativo.
 - INVICTO y Escritor comparten datos y reloj; cambiar de experiencia no debe reiniciar el temporizador ni perder preferencias.
 - Max duerme donde está durante el enfoque en marcha, permanece silencioso y no bloquea controles. Al abrir diálogos o esconder la pestaña, su actividad y audio se detienen.
-- Una sesión completada desbloquea una comida; servir un plato válido la consume. Max empieza pequeño y llega a adulto en 60 sesiones. Su progreso persistente es independiente del total editable de sesiones; platos y popó son temporales.
+- Una sesión completada desbloquea una comida; servir un plato válido la consume. Max empieza pequeño y llega a adulto en 60 sesiones. Su progreso persistente es independiente del total editable de sesiones; platos y popó son temporales. Agua, caricias y juguetes son gratuitos y no alteran recompensas ni crecimiento; solo puede existir un plato de comida o agua.
 
 ## PWA, interfaz y recursos
 

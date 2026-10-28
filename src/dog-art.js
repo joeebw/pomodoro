@@ -1,6 +1,7 @@
 // Original tricolour basset hound: long back, short legs and hanging ears.
 export const DOG_ART = `
   <span class="dog-bubble"></span>
+  <span class="dog-hearts" aria-hidden="true"><i>♥</i><i>♥</i><i>♥</i></span>
   <span class="dog-dream" aria-hidden="true"><i>z</i><i>z</i><i>Z</i></span>
   <svg class="dog-sprite" viewBox="0 0 48 32" aria-hidden="true" shape-rendering="crispEdges">
     <ellipse cx="25" cy="30" rx="20" ry="1" fill="#000" opacity=".16"/>
@@ -26,6 +27,7 @@ export const DOG_ART = `
           <path fill="#8d512f" d="M13 24h3v2h-3z"/>
         </g>
       </g>
+      <g class="dog-dust" fill="#c8aa77"><path d="M29 29h2v2h-2zM39 27h2v2h-2zM43 30h2v1h-2z"/></g>
       <g class="dog-wave-paw"><path fill="#ad6b3b" d="M30 22h4v-7h4v3h-2v8h-6z"/><path fill="#f7ead2" d="M34 12h5v5h-5z"/></g>
       <g class="dog-toy"><path fill="#ed8b44" d="M38 27h6v4h-6z"/><path fill="#ffe285" d="M38 27h3v2h-3z"/></g>
       <g class="dog-head">
@@ -37,9 +39,18 @@ export const DOG_ART = `
         <path fill="#8d512f" d="M38 14h4v1h-4z"/>
         <g class="dog-jaw"><path fill="#e1caaa" d="M36 23h9v2h-9z"/><path class="dog-tongue" fill="#e89594" d="M39 24h3v3h-3z"/></g>
         <g class="dog-carried-toy" transform="translate(37 22) scale(.28)"></g>
+        <g class="dog-sneeze-lines" fill="#a6cfd6"><path d="M44 10h2v2h-2zM46 20h2v2h-2z"/></g>
         <path class="dog-lick-tongue" fill="#e89594" d="M42 20h3v4h-2v-1h-1z"/>
         <path fill="#b84239" d="M31 23h5v3h-5z"/><path fill="#efce76" d="M34 26h2v2h-2z"/>
       </g>
+    </g>
+    <g class="dog-lounging">
+      <path fill="#f7ead2" d="M10 21h24v7H7v-4h3zM12 27h32v3H12z"/>
+      <path fill="#34302c" d="M12 20h17v5H10v-3h2z"/>
+      <path fill="#ad6b3b" d="M6 24h7v4H6zM32 18h10v3h3v6H30v-6h2z"/>
+      <path fill="#f7ead2" d="M38 22h9v6h-9z"/>
+      <path fill="#754329" d="M29 20h6v9h-6z"/>
+      <path fill="#30281f" d="M44 22h4v3h-4zM38 19h2v3h-2z"/>
     </g>
     <g class="dog-asleep">
       <path fill="#f7ead2" d="M10 21h24v7H7v-4h3zM12 27h32v3H12z"/>
@@ -54,7 +65,12 @@ export const DOG_ART = `
 export const BOWL_ART = `<svg viewBox="0 0 44 36" aria-hidden="true" shape-rendering="crispEdges"><g class="max-kibble" fill="#aa6838"><path d="M9 12h6v5H9zM18 10h6v7h-6zM28 12h6v6h-6z"/><path fill="#d5a15e" d="M14 13h5v5h-5zM24 12h5v6h-5z"/></g><path fill="#7b9b9b" d="M5 17h34l-4 12H9z"/><path fill="#a6c2bc" d="M4 17h36v4H4z"/><path fill="#446c71" d="M10 27h24v3H10z"/><path fill="#e5d8b8" d="M20 22h4v3h-4z"/></svg>`;
 export const POOP_ART = `<svg viewBox="0 0 32 32" aria-hidden="true" shape-rendering="crispEdges"><path fill="#75432a" d="M12 6h6v5h4v6h4v4h3v6H3v-6h4v-5h5z"/><path fill="#aa7145" d="M12 11h7v3h-7zM8 18h15v3H8zM5 24h21v2H5z"/></svg>`;
 
+export const WATER_BOWL_ART = `<svg viewBox="0 0 44 36" aria-hidden="true" shape-rendering="crispEdges"><path fill="#45799a" d="M5 17h34l-4 12H9z"/><path fill="#89c8e0" d="M4 17h36v4H4z"/><g class="max-water"><path fill="#69c5e8" d="M8 12h28v6H8z"/><path fill="#dbf4fa" d="M10 13h8v2h-8zM23 15h10v2H23z"/></g><path fill="#335d7a" d="M10 27h24v3H10z"/></svg>`;
+export const PET_ART = `<svg viewBox="0 0 44 44" aria-hidden="true" shape-rendering="crispEdges"><path fill="#e4b48d" d="M14 5h4v13h2V3h4v15h2V6h4v14h2v-8h4v18l-8 9H17L7 26l-2-6h5l4 5z"/><path fill="#f2cfac" d="M17 21h11v12H17z"/><path fill="#d7787b" d="M5 4h3v2h3v4H3V6h2z"/></svg>`;
+export const TOY_LABELS = { bone: 'Hueso', bottle: 'Botella', ball: 'Pelota', frisbee: 'Frisbee' };
 export const TOY_ART = {
   bone: `<svg viewBox="0 0 44 44" aria-hidden="true" shape-rendering="crispEdges"><path fill="#c9a66c" d="M9 10h7v5l13 10h6v10h-8v-4L14 21H8V11z"/><path fill="#f6e1af" d="M6 7h7v4h5v6l13 10h5v-4h6v7h-4v8h-7v-4h-5v-5L13 19H8v4H2v-7h4z"/></svg>`,
+  ball: `<svg viewBox="0 0 44 44" aria-hidden="true" shape-rendering="crispEdges"><path fill="#d76d3d" d="M13 6h18v4h5v5h4v17h-5v5H12v-4H7V14h6z"/><path fill="#f0a05b" d="M13 6h18v4H18v5h-5z"/><path fill="#f7df9d" d="M26 8h4v7h-4zM21 15h5v13h-5zM15 28h6v8h-6z"/></svg>`,
+  frisbee: `<svg viewBox="0 0 44 44" aria-hidden="true" shape-rendering="crispEdges"><path fill="#397f83" d="M8 15h28v4h5v10h-6v4H9v-4H3V19h5z"/><path fill="#78c8ba" d="M9 11h26v4h6v10h-6v4H9v-4H3V15h6z"/><path fill="#c8e8cf" d="M12 15h20v3h4v6H9v-6h3z"/><path fill="#4c9993" d="M16 18h13v5H16z"/><path fill="#f1ce72" d="M30 12h5v4h-5z"/></svg>`,
   bottle: `<svg viewBox="0 0 44 44" aria-hidden="true" shape-rendering="crispEdges"><path fill="#659cbb" d="M17 3h10v7H17z"/><path fill="#a4dbdf" d="M17 10h10v5l5 6v17H12V21l5-6z"/><path fill="#d3f4ed" d="M16 20h4v14h-4z"/><path fill="#638dba" d="M12 24h20v7H12z"/><path fill="#f4ead4" d="M18 25h9v5h-9z"/></svg>`,
 };

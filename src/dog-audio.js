@@ -1,4 +1,5 @@
 const SOURCES = {
+  water: new URL('../assets/audio/max-water.wav', import.meta.url).href,
   bottle: new URL('../assets/audio/max-bottle.wav', import.meta.url).href,
   bark: new URL('../assets/audio/max-bark.mp3', import.meta.url).href,
   pant: new URL('../assets/audio/max-pant.wav', import.meta.url).href,
@@ -7,7 +8,7 @@ const SOURCES = {
   scratch: new URL('../assets/audio/max-scratch.wav', import.meta.url).href,
   lick: new URL('../assets/audio/max-lick.wav', import.meta.url).href,
 };
-const VOLUMES = { bottle: .45, bark: .4, pant: .45, eat: .65, poop: .3, scratch: .45, lick: .45 };
+const VOLUMES = { water: .55, bottle: .45, bark: .4, pant: .45, eat: .65, poop: .3, scratch: .45, lick: .45 };
 
 // Decode the real recordings once. Buffer playback can resume accurately even
 // offline, where cached responses do not necessarily support HTTP byte ranges.

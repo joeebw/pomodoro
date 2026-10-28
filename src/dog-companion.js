@@ -1,3 +1,4 @@
+import { createDogBehavior, POSE_DURATIONS } from './dog-behavior.js';
 import { createMaxPanel } from './max-panel.js';
 import { dogGrowth } from './dog-progress.js';
 import { createDogFetch, planDogFetch } from './dog-fetch.js';
@@ -6,7 +7,6 @@ import { createDogAudio } from './dog-audio.js';
 import { createDogCare } from './dog-care.js';
 import { DOG_SIZE, dogSpots, findDogRoute, isDogSpotFree } from './dog-movement.js';
 
-const POSE_DURATIONS = { scratch: 3200, lick: 1500, roll: 3200, look: 3000, paw: 2400, ball: 3000, bow: 2400 };
 const randomDelay = (min, max) => min + Math.random() * (max - min);
 const distance = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
 function shuffled(items) {
@@ -38,20 +38,21 @@ export function createDogCompanion({ onServe }) {
     onAim: () => { stopActivity(); pose('sit'); },
     onFetch: fetchToy,
     onCancel: () => { stopActivity(); carriedToy.innerHTML = ''; if (!blocked() && !sleeping) rest(); },
-    onChange: (playing) => care.setPlaying(playing),
+    onChange: (playing) => care.setPlaying(playing || petting),
   });
   let currentProgress = { sessions: 0, meals: 0 };
   const panel = createMaxPanel({
-    getState: () => ({ enabled, sleeping, meals: currentProgress.meals, growth: dogGrowth(currentProgress), occupied: Boolean(care.meal) }),
+    getState: () => ({ enabled, sleeping, meals: currentProgress.meals, growth: dogGrowth(currentProgress), occupied: Boolean(care.meal || petting) }),
     onAction: (action) => {
       syncEnvironment(true);
-      const started = action === 'food' ? care.begin() : fetchGame.begin(action);
+      const started = ['food', 'water'].includes(action) ? care.begin(action) : action === 'pet' ? pet() : fetchGame.begin(action);
       if (!started) panel.error('No hay espacio visible suficiente. Prueba otra zona o una ventana más amplia.');
     },
   });
-  const poses = ['sniff', 'sit', 'wag', 'stretch', 'play', 'scratch', 'shake', 'yawn', 'lick', 'bow', 'look', 'paw', 'roll', 'ball'];
+  const behavior = createDogBehavior();
+  let petting = false;
   let enabled = true, sound = true, sleeping = false;
-  let environmentKey = '', lastPose = '';
+  let environmentKey = '';
   let goingToPoop = false;
   let point = { x: 8, y: 8 };
   let positioned = false;
@@ -92,8 +93,8 @@ export function createDogCompanion({ onServe }) {
   }
   function blocked() { return !enabled || document.hidden || Boolean(document.querySelector('dialog[open]')); }
   function rest() {
-    const action = shuffled(poses.filter((entry) => entry !== lastPose))[0];
-    lastPose = action; pose(action);
+    const action = behavior.next(awakeTime);
+    pose(action);
     if (!reducedMotion.matches) timer = setTimeout(wander, POSE_DURATIONS[action] ?? randomDelay(1800, 4200));
   }
   function walk(route, arrived = rest, speed = 42) {
@@ -121,7 +122,7 @@ export function createDogCompanion({ onServe }) {
     frame = requestAnimationFrame(step);
   }
   function wander() {
-    if (blocked() || sleeping || fetchGame.active) return;
+    if (blocked() || sleeping || fetchGame.active || petting) return;
     if (care.meal) { goEat(); return; }
     measure();
     if (!isDogSpotFree(point, viewport, obstacles)) { syncEnvironment(true); return; }
@@ -156,6 +157,12 @@ export function createDogCompanion({ onServe }) {
       }, 1000);
     }, 100);
   }
+  function pet() {
+    if (blocked() || sleeping || care.meal || care.placing || fetchGame.active || petting) return false;
+    stopActivity(); petting = true; care.setPlaying(true); pose('pet'); panel.update();
+    timer = setTimeout(() => { petting = false; care.setPlaying(false); rest(); panel.update(); }, 3000);
+    return true;
+  }
   function planMeal(bowl) {
     measure();
     if (!rectFree(bowl, 44, 44)) return null;
@@ -180,8 +187,8 @@ export function createDogCompanion({ onServe }) {
     Object.assign(meal, plan);
     walk(plan.route, () => {
       dog.style.setProperty('--dog-direction', plan.facing);
-      pose('eat');
-      if (sound) audio.play('eat', (6700 - meal.remaining) / 1000);
+      pose(meal.kind === 'water' ? 'drink' : 'eat');
+      if (sound) audio.play(meal.kind === 'water' ? 'water' : 'eat', (meal.duration - meal.remaining) / 1000);
     }, 60);
   }
   function finishMeal() {
@@ -191,7 +198,7 @@ export function createDogCompanion({ onServe }) {
   }
   function vocalize() {
     const kind = vocalIndex % 2 ? 'pant' : 'bark';
-    if (performance.now() - lastVocal < 10000 || care.meal || sleeping || blocked() || care.placing || goingToPoop || fetchGame.active) return false;
+    if (performance.now() - lastVocal < 10000 || care.meal || sleeping || blocked() || care.placing || goingToPoop || fetchGame.active || petting) return false;
     vocalIndex++;
     stopActivity(); lastVocal = performance.now(); pose(kind);
     if (sound) audio.play(kind);
@@ -229,12 +236,12 @@ export function createDogCompanion({ onServe }) {
     if (blocked() || sleeping || dog.hidden) return;
     awakeTime += elapsed;
     const meal = care.meal;
-    if (meal && dog.dataset.action === 'eat') {
+    if (meal && ['eat', 'drink'].includes(dog.dataset.action)) {
       meal.remaining = Math.max(0, meal.remaining - elapsed); care.updateMeal();
       if (!meal.remaining) finishMeal();
       return;
     }
-    if (meal || care.placing || fetchGame.active) return;
+    if (meal || care.placing || fetchGame.active || petting) return;
     if (awakeTime >= nextPoop && !goingToPoop && dog.dataset.action !== 'poop') {
       // Retry shortly if interrupted or no space is reachable; don't postpone
       // the entire interval when Max happens to be beside a control.
@@ -250,7 +257,7 @@ export function createDogCompanion({ onServe }) {
     const key = `${enabled}:${sleeping}:${document.hidden}:${Boolean(document.querySelector('dialog[open]'))}:${reducedMotion.matches}`;
     if (force !== true && key === environmentKey) return;
     environmentKey = key;
-    stopActivity(); fetchGame.clear(); carriedToy.innerHTML = ''; clearInterval(heartbeat); heartbeat = null; audio.stop();
+    stopActivity(); petting = false; fetchGame.clear(); carriedToy.innerHTML = ''; clearInterval(heartbeat); heartbeat = null; audio.stop();
     care.setVisible(!blocked());
     panel.update();
     fetchGame.setAvailability({ show: enabled, canPlay: !sleeping && !blocked() && !care.meal && !care.placing });
@@ -275,7 +282,7 @@ export function createDogCompanion({ onServe }) {
     if (care.meal) goEat(); else rest();
   }
   function react(event) {
-    if (blocked() || sleeping || dog.hidden || care.meal || care.placing || goingToPoop || fetchGame.active) return;
+    if (blocked() || sleeping || dog.hidden || care.meal || care.placing || goingToPoop || fetchGame.active || petting) return;
     if (event.target.closest('button, a, input, select, textarea, [role="button"]')) return;
     const center = { x: point.x + DOG_SIZE.width / 2, y: point.y + DOG_SIZE.height / 2 };
     const proximity = distance({ x: event.clientX, y: event.clientY }, center);

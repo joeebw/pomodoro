@@ -1,5 +1,5 @@
 // Incrementa esta versión al cambiar los recursos precargados de la aplicación.
-const CACHE_NAME = 'brota-shell-v37';
+const CACHE_NAME = 'brota-shell-v38';
 const APP_FILES = [
   '/',
   '/index.html',
@@ -19,6 +19,7 @@ const APP_FILES = [
   '/assets/audio/max-pant.wav',
   '/assets/audio/max-bark.mp3',
   '/assets/audio/max-bottle.wav',
+  '/assets/audio/max-water.wav',
   '/assets/audio/max-eat.mp3',
   '/assets/audio/max-poop.mp3',
   '/assets/audio/max-scratch.wav',
@@ -35,6 +36,7 @@ const APP_FILES = [
   '/src/writer-machine.js',
   '/src/main.js',
   '/src/dog-companion.js',
+  '/src/dog-behavior.js',
   '/src/dog-care.js',
   '/src/max-panel.js',
   '/src/max-placement.js',

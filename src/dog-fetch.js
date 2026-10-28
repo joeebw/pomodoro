@@ -2,7 +2,7 @@ import { createMaxPlacement } from './max-placement.js';
 import { findDogRoute, isDogSpotFree } from './dog-movement.js';
 import { TOY_ART } from './dog-art.js';
 
-const names = { bone: 'el hueso', bottle: 'la botella' };
+const names = { bone: 'el hueso', bottle: 'la botella', ball: 'la pelota', frisbee: 'el frisbee' };
 const homeToy = (origin) => ({ x: origin.x + 20, y: origin.y + 32 });
 export function planDogFetch(origin, landing, viewport, obstacles) {
   const freeToy = landing.x >= 8 && landing.y >= 8 && landing.x + 44 <= viewport.width - 8 && landing.y + 44 <= viewport.height - 8
@@ -59,15 +59,20 @@ export function createDogFetch({ getOrigin, planThrow, onAim, onFetch, onCancel,
     keyboardRound = keyboard; phase = 'flight'; render();
     toy.innerHTML = TOY_ART[kind]; toy.disabled = true; toy.hidden = false; position(toy, plan.home);
     placement.activity('Max recoge el juguete y vuelve al punto marcado.', () => clear(true));
+    const startOutbound = () => { animation?.cancel(); animation = null; phase = 'outbound'; render(); onFetch(plan, kind); };
     const landed = () => {
-      animation?.cancel(); animation = null;
-      position(toy, plan.landing); phase = 'outbound'; render(); onFetch(plan, kind);
+      animation?.cancel(); animation = null; position(toy, plan.landing);
+      if (kind === 'ball' && !reducedMotion.matches) {
+        phase = 'landing'; render();
+        animation = toy.animate([{ transform: `translate(${plan.landing.x}px,${plan.landing.y}px)` }, { transform: `translate(${plan.landing.x}px,${plan.landing.y - 18}px)` }, { transform: `translate(${plan.landing.x}px,${plan.landing.y}px)` }], { duration: 300, easing: 'ease-out' });
+        flightTimer = setTimeout(startOutbound, 300);
+      } else startOutbound();
     };
     if (reducedMotion.matches) { landed(); return; }
     animation = toy.animate([
       { transform: `translate(${plan.home.x}px,${plan.home.y}px) rotate(0deg)` },
       { transform: `translate(${(plan.home.x + plan.landing.x) / 2}px,${Math.max(8, Math.min(plan.home.y, plan.landing.y) - 70)}px) rotate(180deg)` },
-      { transform: `translate(${plan.landing.x}px,${plan.landing.y}px) rotate(360deg)` },
+      { transform: `translate(${plan.landing.x}px,${plan.landing.y}px) rotate(${kind === 'frisbee' ? 1080 : 360}deg)` },
     ], { duration: 500, easing: 'ease-in-out' });
     flightTimer = setTimeout(landed, 500);
   }

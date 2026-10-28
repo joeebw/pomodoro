@@ -57,7 +57,7 @@ test('real audio buffers resume at the requested offset and cancelled loads cann
     assert.equal(starts.length, count, 'zero volume does not start another recording');
     audio.setVolume(100);
     audio.stop();
-    for (const kind of ['bark', 'poop', 'scratch', 'lick', 'bottle']) {
+    for (const kind of ['bark', 'poop', 'scratch', 'lick', 'bottle', 'water']) {
       audio.play(kind, 0, { delay: kind === 'poop' ? .55 : 0 });
       await settle();
       assert.equal(starts.at(-1).when, kind === 'poop' ? 100.55 : 0);

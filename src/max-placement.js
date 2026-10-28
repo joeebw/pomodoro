@@ -1,10 +1,14 @@
 const controlSelector = 'button, a, input, select, textarea, [role="button"], .timer-content, .dog-companion';
 export function suggestedPlacement(width, height, validate) {
-  const xs = [...new Set([8, width - 52, ...Array.from({ length: Math.max(0, Math.floor((width - 60) / 24)) }, (_, i) => 8 + i * 24)])];
-  const ys = [...new Set([8, height - 52, ...Array.from({ length: Math.max(0, Math.floor((height - 60) / 24)) }, (_, i) => 8 + i * 24)])];
-  for (const x of xs) for (const y of ys) {
-    const point = { x, y };
-    if (validate(point)) return point;
+  // Try a coarse grid first, then narrow gaps common beside mobile controls.
+  const axis = (length, step) => [...new Set([8, length - 52,
+    ...Array.from({ length: Math.max(0, Math.floor((length - 60) / step)) }, (_, i) => 8 + i * step),
+  ])];
+  for (const step of [24, 8]) {
+    for (const x of axis(width, step)) for (const y of axis(height, step)) {
+      const point = { x, y };
+      if (validate(point)) return point;
+    }
   }
   return null;
 }
