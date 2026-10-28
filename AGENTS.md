@@ -32,6 +32,7 @@ Abre `http://127.0.0.1:8000`. No uses `file://`: la aplicación necesita cargar 
 | Experiencias, identidad y tema | `src/experiences.js`, `src/brand.js`, `src/theme.js` |
 | Celebración y experiencia Escritor | `src/session-celebration.js`, `src/writer-*.js`, `src/champion-art.js` |
 | Conducta, cuidados, rutas, progreso, sonido y gráficos de Max | `src/dog-companion.js`, `src/dog-care.js`, `src/dog-fetch.js`, `src/dog-movement.js`, `src/dog-progress.js`, `src/dog-audio.js`, `src/dog-art.js` |
+| Panel de Max y colocación compartida de objetos | `src/max-panel.js`, `src/max-placement.js` |
 | Catálogos y selección de citas | `src/quotes.js`, `src/athlete-quotes.js`, `src/classic-quotes.js`, `src/writer-quotes.js` |
 | Instalación y recursos sin conexión | `src/pwa.js`, `sw.js`, `manifest.webmanifest` |
 | Estructura y presentación | `index.html`, `styles.css` y hojas CSS específicas de cada experiencia o función |

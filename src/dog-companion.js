@@ -1,3 +1,4 @@
+import { createMaxPanel } from './max-panel.js';
 import { dogGrowth } from './dog-progress.js';
 import { createDogFetch, planDogFetch } from './dog-fetch.js';
 import { DOG_ART, TOY_ART } from './dog-art.js';
@@ -39,6 +40,15 @@ export function createDogCompanion({ onServe }) {
     onCancel: () => { stopActivity(); carriedToy.innerHTML = ''; if (!blocked() && !sleeping) rest(); },
     onChange: (playing) => care.setPlaying(playing),
   });
+  let currentProgress = { sessions: 0, meals: 0 };
+  const panel = createMaxPanel({
+    getState: () => ({ enabled, sleeping, meals: currentProgress.meals, growth: dogGrowth(currentProgress), occupied: Boolean(care.meal) }),
+    onAction: (action) => {
+      syncEnvironment(true);
+      const started = action === 'food' ? care.begin() : fetchGame.begin(action);
+      if (!started) panel.error('No hay espacio visible suficiente. Prueba otra zona o una ventana más amplia.');
+    },
+  });
   const poses = ['sniff', 'sit', 'wag', 'stretch', 'play', 'scratch', 'shake', 'yawn', 'lick', 'bow', 'look', 'paw', 'roll', 'ball'];
   let enabled = true, sound = true, sleeping = false;
   let environmentKey = '', lastPose = '';
@@ -56,7 +66,7 @@ export function createDogCompanion({ onServe }) {
 
   function measure() {
     viewport = { width: innerWidth, height: innerHeight };
-    obstacles = [...document.querySelectorAll('button, a, input, select, textarea, [role="button"], .timer-content, .daily-quote, .writer-intro')]
+    obstacles = [...document.querySelectorAll('button, a, input, select, textarea, [role="button"], .timer-content, .daily-quote, .writer-intro, .max-placement:not([hidden])')]
       .filter((element) => !element.closest('.max-care, .max-fetch') && element.getClientRects().length && getComputedStyle(element).visibility !== 'hidden')
       .map((element) => element.getBoundingClientRect()).filter((rect) => rect.width > 0 && rect.height > 0);
   }
@@ -242,6 +252,7 @@ export function createDogCompanion({ onServe }) {
     environmentKey = key;
     stopActivity(); fetchGame.clear(); carriedToy.innerHTML = ''; clearInterval(heartbeat); heartbeat = null; audio.stop();
     care.setVisible(!blocked());
+    panel.update();
     fetchGame.setAvailability({ show: enabled, canPlay: !sleeping && !blocked() && !care.meal && !care.placing });
     if (blocked()) { dog.hidden = true; return; }
     measure();
@@ -290,12 +301,13 @@ export function createDogCompanion({ onServe }) {
   document.addEventListener('keydown', (event) => { if (event.isTrusted && enabled && sound) audio.unlock(); });
   document.addEventListener('visibilitychange', () => syncEnvironment());
   new MutationObserver(() => syncEnvironment()).observe(document.body, { subtree: true, attributes: true, attributeFilter: ['open'] });
-  document.addEventListener('toggle', (event) => { if (event.target.matches('dialog')) syncEnvironment(true); }, true);
+  document.addEventListener('toggle', (event) => { if (event.target.matches('dialog')) syncEnvironment(); }, true);
   window.addEventListener('resize', () => syncEnvironment(true));
   window.addEventListener('scroll', () => syncEnvironment(true), { passive: true });
   reducedMotion.addEventListener('change', () => syncEnvironment(true));
   return {
     update({ mode, running, enabled: showDog, sound: dogSound, progress, volume }) {
+      currentProgress = progress;
       audio.setVolume(volume);
       const wasSleeping = sleeping;
       enabled = showDog; sound = dogSound; sleeping = mode === 'focus' && running;
@@ -308,6 +320,7 @@ export function createDogCompanion({ onServe }) {
       if (sleeping && !wasSleeping) care.clearPoop();
       if (!sound) audio.stop();
       syncEnvironment();
+      panel.update();
     },
   };
 }

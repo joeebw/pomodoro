@@ -1,5 +1,5 @@
 // Incrementa esta versión al cambiar los recursos precargados de la aplicación.
-const CACHE_NAME = 'brota-shell-v36';
+const CACHE_NAME = 'brota-shell-v37';
 const APP_FILES = [
   '/',
   '/index.html',
@@ -36,6 +36,8 @@ const APP_FILES = [
   '/src/main.js',
   '/src/dog-companion.js',
   '/src/dog-care.js',
+  '/src/max-panel.js',
+  '/src/max-placement.js',
   '/src/dog-fetch.js',
   '/src/dog-art.js',
   '/src/dog-progress.js',

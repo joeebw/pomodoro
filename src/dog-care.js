@@ -1,58 +1,32 @@
+import { createMaxPlacement } from './max-placement.js';
 import { BOWL_ART, POOP_ART } from './dog-art.js';
 
 export function createDogCare({ planMeal, onMealChange, onServe }) {
-  const feed = document.querySelector('#max-feed');
+  const placement = createMaxPlacement();
   const layer = document.createElement('div');
   layer.className = 'max-care';
-  layer.innerHTML = `<div class="max-placement" hidden><span role="status">Elige un espacio libre para el plato. También puedes usar las flechas y Enter.</span><button type="button">Cancelar</button></div><div class="max-bowl max-bowl-preview" hidden>${BOWL_ART}</div>`;
   document.body.append(layer);
-  const toolbar = layer.querySelector('.max-placement');
-  const message = toolbar.querySelector('[role="status"]');
-  const preview = layer.querySelector('.max-bowl-preview');
   let placing = false;
   let enabled = true;
   let meals = 0, sleeping = false, playing = false;
   let meal = null;
-  let cursor = { x: innerWidth / 2, y: innerHeight / 2 };
   const poops = new Set();
   const poopLocations = new WeakMap();
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-  const bowlPoint = () => ({ x: Math.max(8, Math.min(innerWidth - 52, cursor.x - 22)), y: Math.max(8, Math.min(innerHeight - 52, cursor.y - 18)) });
-  function movePreview() {
-    const p = bowlPoint();
-    preview.style.transform = `translate(${p.x}px, ${p.y}px)`;
-  }
-  function renderButton() {
-    feed.disabled = placing || Boolean(meal) || meals === 0 || sleeping || playing;
-    feed.hidden = !enabled;
-    const label = playing ? 'Max está jugando: espera a que regrese' : meal ? 'Comida servida para Max' : sleeping ? 'Max duerme: dale de comer al terminar el enfoque'
-      : meals === 0 ? 'Completa una sesión de enfoque para darle de comer a Max' : `Darle de comer a Max (${meals} ${meals === 1 ? 'comida disponible' : 'comidas disponibles'})`;
-    feed.setAttribute('aria-label', label);
-    feed.title = label;
-    const text = feed.querySelector('.max-feed-label');
-    if (text) text.textContent = label; else feed.textContent = label;
-  }
   function cancel(restoreFocus = false, notify = true) {
     const wasPlacing = placing;
-    placing = false;
-    toolbar.hidden = true;
-    preview.hidden = true;
-    renderButton();
-    if (restoreFocus) feed.focus({ preventScroll: true });
+    placing = false; placement.stop();
+    if (restoreFocus) document.querySelector('#max-open').focus({ preventScroll: true });
     if (wasPlacing && notify) onMealChange();
   }
   function clearMeal(notify = true) {
     if (!meal) return;
-    meal.element.remove(); meal = null; renderButton();
+    meal.element.remove(); meal = null; placement.stop();
     if (notify) onMealChange();
   }
-  function serve() {
-    const point = bowlPoint();
+  function serve(point) {
     const plan = planMeal(point);
-    if (!plan) {
-      message.textContent = 'Max no puede comer ahí. Elige otro espacio libre y accesible.';
-      return;
-    }
+    if (!plan) return;
     if (sleeping || !meals || !onServe()) { cancel(true); return; }
     const element = document.createElement('button');
     element.className = 'max-bowl';
@@ -64,42 +38,21 @@ export function createDogCare({ planMeal, onMealChange, onServe }) {
     element.addEventListener('click', () => clearMeal());
     layer.append(element);
     meal = { ...plan, point, element, remaining: 6700 };
-    cancel(true, false);
+    placing = false;
+    placement.activity('Max va a comer. Puedes retirar el plato.', () => clearMeal());
     onMealChange();
   }
-  feed.addEventListener('click', () => {
-    if (!enabled || meal || !meals || sleeping || playing) return;
+  function begin() {
+    if (!enabled || meal || !meals || sleeping || playing) return false;
     placing = true;
-    toolbar.hidden = false; preview.hidden = false;
-    message.textContent = 'Elige un espacio libre para el plato. También puedes usar las flechas y Enter.';
-    movePreview(); renderButton();
-    toolbar.querySelector('button').focus({ preventScroll: true });
+    const started = placement.start({ art: BOWL_ART, label: 'Elige dónde servir la comida', validate: planMeal, onConfirm: serve, onCancel: () => cancel(true) });
+    if (!started) { placing = false; return false; }
     onMealChange();
-  });
-  toolbar.querySelector('button').addEventListener('click', () => cancel(true));
-  document.addEventListener('pointermove', (event) => {
-    if (!placing) return;
-    cursor = { x: event.clientX, y: event.clientY }; movePreview();
-  }, { passive: true });
-  document.addEventListener('click', (event) => {
-    if (!placing || event.target.closest('.max-placement, #max-feed')) return;
-    if (event.target.closest('button, a, input, select, textarea, [role="button"]')) { cancel(); return; }
-    cursor = { x: event.clientX, y: event.clientY }; movePreview(); serve();
-  });
-  document.addEventListener('keydown', (event) => {
-    if (!placing) return;
-    if (!['Escape', 'Enter', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) return;
-    event.preventDefault();
-    if (event.key === 'Escape') { cancel(true); return; }
-    if (event.key === 'Enter') { serve(); return; }
-    cursor.x += event.key === 'ArrowRight' ? 12 : event.key === 'ArrowLeft' ? -12 : 0;
-    cursor.y += event.key === 'ArrowDown' ? 12 : event.key === 'ArrowUp' ? -12 : 0;
-    cursor.x = Math.max(30, Math.min(innerWidth - 30, cursor.x));
-    cursor.y = Math.max(26, Math.min(innerHeight - 26, cursor.y));
-    movePreview();
-  });
+    return true;
+  }
   function clearPoop() { for (const element of poops) element.remove(); poops.clear(); }
   return {
+    begin,
     get meal() { return meal; },
     get placing() { return placing; },
     get poopCount() { return poops.size; },
@@ -111,16 +64,14 @@ export function createDogCare({ planMeal, onMealChange, onServe }) {
       if (meal) meal.element.hidden = !canShow(meal.point);
       for (const element of poops) element.hidden = !canShow(poopLocations.get(element));
     },
-    setPlaying(value) { playing = value; renderButton(); },
+    setPlaying(value) { playing = value; },
     setFeeding({ available, asleep }) {
       meals = available; sleeping = asleep;
-      if (sleeping || meals === 0) cancel(false, false);
-      renderButton();
+      if (sleeping || (meals === 0 && placing)) cancel(false, false);
     },
     setEnabled(value) {
       enabled = value;
       if (!enabled) { cancel(false, false); clearMeal(false); clearPoop(); }
-      renderButton();
     },
     setVisible(value) {
       layer.hidden = !value;
